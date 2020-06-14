@@ -2,9 +2,7 @@
 title: "Solutions for first script"
 author: "Felix Lennert"
 date: "knit on `r lubridate::today()`"
-output: 
-  html_document: default
-  pdf_document: default
+output: html_document
 csl: ASA.csl
 bibliography: example-bib.bib
 ---

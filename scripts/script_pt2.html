@@ -364,7 +364,7 @@ summary {
 
 <h1 class="title toc-ignore">Learning R – First steps</h1>
 <h4 class="author">Felix Lennert</h4>
-<h4 class="date">knit on 2020-06-11</h4>
+<h4 class="date">knit on 2020-06-14</h4>
 
 </div>
 
@@ -480,9 +480,9 @@ y &lt;- x &gt; 500 # whether numbers are greater than 500
 typeof(y)</code></pre>
 <pre><code>## [1] &quot;logical&quot;</code></pre>
 <pre class="r"><code>sum(y) # how many are greater than 500</code></pre>
-<pre><code>## [1] 52</code></pre>
+<pre><code>## [1] 54</code></pre>
 <pre class="r"><code>mean(y) # proportion of numbers which are be greater than 500</code></pre>
-<pre><code>## [1] 0.52</code></pre>
+<pre><code>## [1] 0.54</code></pre>
 <p>Also, if you build a vector out of multiple types – the most complex type always wins:</p>
 <pre class="r"><code>typeof(c(TRUE, 1L))</code></pre>
 <pre><code>## [1] &quot;integer&quot;</code></pre>
@@ -603,13 +603,15 @@ vector_of_numbers</code></pre>
 <h4>Factors</h4>
 <p>Factors are used in R to represent categorical variables. They can only take a limited amount of values. Think for example of something like party affiliation of members of the German parliament. This should be stored as a factor, because you have a limited set of values (i.e., AfD, Buendnis 90/Die Gruenen, CDU, CSU, Die Linke, FDP, SPD, fraktionslos) which apply to multiple politicians. Names, on the other hand, should be stored as characters, since there is (in theory) an infinite number of possible values.</p>
 <p>Factors are built on top of integers. They have an attribute called “levels”.</p>
-<pre class="r"><code>mdbs &lt;- factor(c(&quot;Alice Weidel&quot;, &quot;Robert Habeck&quot;, &quot;Julia Kloeckner&quot;, &quot;Andreas Scheuer&quot;, &quot;Bernd Riexinger&quot;, &quot;Katarina Barley&quot;), 
-        levels = c(&quot;AfD&quot;, &quot;Buendnis90/Die Gruenen&quot;, &quot;CDU&quot;, &quot;CSU&quot;, &quot;Die Linke&quot;, &quot;SPD&quot;))
+<pre class="r"><code>mdbs &lt;- factor(levels = c(&quot;AfD&quot;, &quot;Buendnis90/Die Gruenen&quot;, &quot;CDU&quot;, &quot;CSU&quot;, &quot;Die Linke&quot;, &quot;SPD&quot;))
 levels(mdbs)</code></pre>
 <pre><code>## [1] &quot;AfD&quot;                    &quot;Buendnis90/Die Gruenen&quot; &quot;CDU&quot;                   
 ## [4] &quot;CSU&quot;                    &quot;Die Linke&quot;              &quot;SPD&quot;</code></pre>
 <pre class="r"><code>typeof(mdbs)</code></pre>
 <pre><code>## [1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>mdbs</code></pre>
+<pre><code>## factor(0)
+## Levels: AfD Buendnis90/Die Gruenen CDU CSU Die Linke SPD</code></pre>
 <p>In our daily workflow, we normally convert character vectors to factors using <code>as.factor()</code>. We will learn more about factors – and the <code>forcats</code> package which has been dedicated to them – in the session about data wrangling.</p>
 </div>
 <div id="date-and-date-time" class="section level4">
@@ -681,7 +683,7 @@ new_tibble</code></pre>
 <ol style="list-style-type: lower-alpha">
 <li>Store them in a vector. Name the elements.</li>
 <li>The animals have bred. There are now 75 per cent more chicken, 30 per cent more cows, and 50 per cent more horses. What is this in absolute numbers? Store the results in a new vector. Round up the results using the <code>ceiling()</code> function.</li>
-<li>The farmer has to pay the tax amount x for every 2000th animal of a certain breed. How many times x does she have to pay for every breed (hint: google “modulo operator r”)? For which breed does she have to pay the most (you can use the <code>max()</code> function for this)?</li>
+<li>The farmer has to pay the tax amount x for every 2000th animal of a certain breed. How many times x does she have to pay for every breed (hint: use the <code>floor()</code> function)? For which breed does she have to pay the most (you can use the <code>max()</code> function for this)?</li>
 </ol>
 <ol start="4" style="list-style-type: decimal">
 <li>Store the data from task 3 in a tibble. Name the columns <code>breed</code>, <code>number_timepoint_1</code>, <code>number_timepoint_2</code>, <code>number of tax units</code>.</li>
@@ -700,7 +702,7 @@ new_tibble</code></pre>
 </li>
 <li>read the <a href="https://style.tidyverse.org/index.html">tidyverse style guide</a> – and then stick to it.<br />
 </li>
-<li>Probably one of the hardest things in this tutorials to get one’s head around is factors. <a href="https://www.gormanalysis.com/blog/r-introduction-to-factors-tutorial/">Here</a> you can find more about them.<br />
+<li>Probably one of the hardest things in this tutorials to get one’s head around are factors. <a href="https://www.gormanalysis.com/blog/r-introduction-to-factors-tutorial/">Here</a> you can find more about them.<br />
 </li>
 <li>Some <a href="https://www.tutorialspoint.com/r/r_data_types.htm">basic tutorials</a>.<br />
 </li>

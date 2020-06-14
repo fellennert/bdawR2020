@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 In probably every script you write you will reach a point where you either want to read in some data to perform operations on them or export the product of those operations to share it with others. In the following, I will show you how to accomplish both.  
 
-In the beginning, the `readr` package will be introduced. It can be used for the import of the majority of files you will ever want to import and export. If the files become larger, `vroom` is a viable alternative. Beyond that, there exist some more packages for other types such as Excel or Stata files. I will provide you with a basic tutorial on how to deal with them, too. If you want to work with data in other programming environments, `feather` might be the way to go.
+In the beginning, the `readr` package [@hester2018] will be introduced. It can be used for the import of the majority of files you will ever want to import and export. If the files become larger, `vroom` [@hester2020] is a viable alternative. Beyond that, there exist some more packages for other types such as Excel or Stata files. I will provide you with a basic tutorial on how to deal with them, too. If you want to work with data in other programming environments, `feather` [@wickham2019d] might be the way to go.
 
 Some notes on the notation: `"file.csv"` relates to the file you want to read in -- please note that it needs to be provided as a character vector, `tibble` to the Tibble you want to write.
 
@@ -252,7 +252,7 @@ There do also other packages exist for different data types. I will explain the 
 
 ### `haven`
 
-You can use `haven` for reading and writing SAS (suffixes `.sas7bdat`, `.sas7bcat`, and `.xpt`),  SPSS (suffixes `.sav` and `.por`), and STATA (suffix `.dta`) files.
+You can use `haven` [@wickham2020b] for reading and writing SAS (suffixes `.sas7bdat`, `.sas7bcat`, and `.xpt`),  SPSS (suffixes `.sav` and `.por`), and STATA (suffix `.dta`) files.
 
 The functions then are:   
 
@@ -264,7 +264,7 @@ The additional arguments can be found in the [vignette](https://cran.r-project.o
 
 ### `readxl`
 
-`readxl` can be used to read Excel files. `read_excel("file.xls")` works for both `.xls` and `.xlsx` files alike. It guesses the data type from the suffix. Excel files often consist of multiple sheets. `excel_sheets("file.xlsx")` returns the name of the singular sheets. When dealing with an Excel file that contains multiple sheets, you need to specify the sheet you are after in the `read_excel()` function: `read_excel("file.xlsx", sheet = "sheet_1")`. Please note that it only takes one sheet at a time. 
+`readxl` [@wickham2019e] can be used to read Excel files. `read_excel("file.xls")` works for both `.xls` and `.xlsx` files alike. It guesses the data type from the suffix. Excel files often consist of multiple sheets. `excel_sheets("file.xlsx")` returns the name of the singular sheets. When dealing with an Excel file that contains multiple sheets, you need to specify the sheet you are after in the `read_excel()` function: `read_excel("file.xlsx", sheet = "sheet_1")`. Please note that it only takes one sheet at a time. 
 
 More on the `readxl` package can be found [here](https://readxl.tidyverse.org).
 

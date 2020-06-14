@@ -2,9 +2,7 @@
 title: "Learning R — Getting Started"
 author: "Felix Lennert"
 date: "knit on `r lubridate::today()`"
-output:
-  html_document: default
-  pdf_document: default
+output: html_document
 csl: ASA.csl
 bibliography: bibliographyR.bib
 ---
@@ -20,7 +18,7 @@ in the following, you will receive a gentle introduction to R. In the first part
 
 There are loads of resources online and I do not claim this introduction to be exhaustive. To acknowledge this shortcoming, every part ends with links leading you to further resources. However, the fact that I included them probably means that I have read them and more or less integrated their content into the tutorial -- so keep striving for more resources (and send me links)!
 
-In general, this tutorial was heavily inspired by Richard Cotton's "Learning R" [@cotton2013] and Hadley Wickham's and Garrett Grolemund's "R for Data Science" (abbreviated with R4DS). The latter can be found [online](https://r4ds.had.co.nz) [@wickham2016a]. We will not immediately start out with the packages from the tidyverse (although [some strong points](http://varianceexplained.org/r/teach-tidyverse/) have been made in favor of doing so right from the start). I will rather try to build some sort of foundation from where we can proceed to the tidy packages in the following lessons. Hence, one can also understand this tutorial as an introduction to the *tidyverse* (or *hadleyverse*, as it was named originally), even though I will not introduce it in this very first part. 
+In general, this tutorial was heavily inspired by Richard Cotton's "Learning R" [@cotton2013] and Hadley Wickham's and Garrett Grolemund's "R for Data Science" (abbreviated with R4DS). The latter can be found [online](https://r4ds.had.co.nz) [@wickham2016a]. We will not immediately start out with the packages from the tidyverse (although [some strong points](http://varianceexplained.org/r/teach-tidyverse/) have been made in favor of doing so right from the start). I will rather try to build some sort of foundation from where we can proceed to the tidy packages in the following lessons. Hence, one can also understand this tutorial as an introduction to the *tidyverse* [@wickham2019c] (or *hadleyverse*, as it was named originally), even though I will not introduce it in this very first part. 
 When it comes to what I would refer to as the "daily workflow" with R and RStudio, Jennifer Bryan's blog articles have been a big inspiration for me. You will stumble across her work when we deal with the purrr package as well.  
 When looking at RMarkdown, I will mainly build on "R Markdown: The Definitive Guide" -- which is also freely available online [@xie2018].
 

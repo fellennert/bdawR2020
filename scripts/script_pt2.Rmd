@@ -272,10 +272,11 @@ Factors are used in R to represent categorical variables. They can only take a l
 Factors are built on top of integers. They have an attribute called "levels".
 
 ```{r}
-mdbs <- factor(c("Alice Weidel", "Robert Habeck", "Julia Kloeckner", "Andreas Scheuer", "Bernd Riexinger", "Katarina Barley"), 
-        levels = c("AfD", "Buendnis90/Die Gruenen", "CDU", "CSU", "Die Linke", "SPD"))
+mdbs <- factor(levels = c("AfD", "Buendnis90/Die Gruenen", "CDU", "CSU", "Die Linke", "SPD"))
 levels(mdbs)
 typeof(mdbs)
+
+mdbs
 ```
 
 In our daily workflow, we normally convert character vectors to factors using `as.factor()`. We will learn more about factors -- and the `forcats` package which has been dedicated to them -- in the session about data wrangling.
