@@ -38,11 +38,11 @@ In general, importing data with `readr` is pretty hassle-free: the hardest thing
 
 The following unordered list shows the most common `read_*()` functions. Usually, you can simply provide them a file path and they load in the data and return a Tibble. If your data is in a compressed file with the extension `.gz`, `.bz2`, `.xz`, or `.zip`, `readr` will automatically uncompress it. if the file is stored online, you can provide a URL starting with `http://`, `https://`, `ftp://`, or `ftps://`. `readr` will automatically take care of the download process.
 
-* `read_csv(file = "file.csv")` reads comma delimited files      
-* `read_csv2(file = "file.csv")` reads semi-colon delimited files and treats commas as           
-* `read_delim(file = "file.txt", delim = "|")` reads files which are delimited by whatever delimiter you specify (`|` in this case)        
-* `read_fwf(file = "file.fwf", col_positions = c(1, 3, 5))` reads fixed width files. Here, some sort of data on the columns must be provided, e.g., their positions in the file       
-* If the values are separated by whitespace, you can also use `read_tsv(file = "file.tsv")` or `read_table(file = "file.tsv")`
+* `read_csv("file.csv")` reads comma delimited files      
+* `read_csv2("file.csv")` reads semi-colon delimited files and treats commas as           
+* `read_delim("file.txt", delim = "|")` reads files which are delimited by whatever delimiter you specify (`|` in this case)        
+* `read_fwf("file.fwf", col_positions = c(1, 3, 5))` reads fixed width files. Here, some sort of data on the columns must be provided, e.g., their positions in the file       
+* If the values are separated by whitespace, you can also use `read_tsv("file.tsv")` or `read_table("file.tsv")`
 
 ## …and their additional arguments
 
@@ -52,7 +52,7 @@ Also, all these functions share certain arguments which just need to be included
 * If your file does not have column names, but you want the resulting Tibble to have some, you can specify them with `col_names = c("a", "b", "c")`. It takes a character vector.     
 * If there are rows you do not want to be considered, you can use `skip =`. For instance, `read_csv("file.csv", skip = 6)` reads everything but the first six data rows (the very first row is normally used for column names and taken into consideration)       
 * Sometimes the original creator of your data set might go across missing values differently than you would want it to. `na =` can be used to specify which values shall be considered missing. If your missings are coded as 99 and 999, for instance, you can address that in the read-in process already by using `read_csv("file.csv", na = c("99", "999"))`. Please note that it takes a character vector as argument     
-* In some data sets, the first rows consists of comments that start with particular signs or special characters. Using `comment = ` allows you to skip these lines. For instance, `read_csv(file = "file.csv", comment = "#")` drops all the rows that beginn with a hash. 
+* In some data sets, the first rows consists of comments that start with particular signs or special characters. Using `comment = ` allows you to skip these lines. For instance, `read_csv("file.csv", comment = "#")` drops all the rows that beginn with a hash. 
 
 ## Column types
 
@@ -61,7 +61,7 @@ As you have already learned in the script before, a Tibble consists of multiple 
 ```{r}
 library(tidyverse)
 # library(readr) --> no need to load readr, it's part of the core tidyverse
-spotify_top100_2018 <- read_csv(file = "data/spotify2018.csv")
+spotify_top100_2018 <- read_csv("data/spotify2018.csv")
 ```
 
 If your data is well-behaved, R will guess the vector types correctly and everything will run smoothly. However, sooner or later you will stumble across a data set which is not well-behaved. This is where knowing how to fine-tune your parsing process up-front will eventuelly save you a lot of head scratching.    
@@ -225,7 +225,7 @@ Fourth, modify the argument:
 
 ## `.rds` and `.RData`files
 
-`.rds` files can be used to store singular R-specific objects (such as lists), `.RData` files can be used to store multiple R-specific objects. The former can be read in using `read_rds(file = "file.rds")`, the latter with `load("file.RData")`. More on `read_rds()` [here](https://readr.tidyverse.org/reference/read_rds.html) and `.RData` [here](http://www.sthda.com/english/wiki/saving-data-into-r-data-format-rds-and-rdata)
+`.rds` files can be used to store singular R-specific objects (such as lists), `.RData` files can be used to store multiple R-specific objects. The former can be read in using `read_rds("file.rds")`, the latter with `load("file.RData")`. More on `read_rds()` [here](https://readr.tidyverse.org/reference/read_rds.html) and `.RData` [here](http://www.sthda.com/english/wiki/saving-data-into-r-data-format-rds-and-rdata)
 
 # Write data 
 
@@ -246,7 +246,6 @@ Akin to `.rds` files are `.RData` files. They can contain multiple objects and b
 `feather` provides you with the possibility to write Tibbles in a format which is language-agnostic. Hence, it makes it easier to share data across different languages. You need to 
 read_feather(path, columns = NULL) write_feather(x, path)
 
-
 # Alternative ways to read in and write data
 
 There do also other packages exist for different data types. I will explain the ones which might be of particular use for you and their main-functions only briefly.
@@ -257,15 +256,15 @@ You can use `haven` for reading and writing SAS (suffixes `.sas7bdat`, `.sas7bca
 
 The functions then are:   
 
-* `read_sas(file = "file.sas7bdate"` and `write_sas(tibble, file = "file.sas7bdat")` for both `.sas7bdat` and `.sas7bcat` files. `read_xpt(file = "file.xpt")` reads `.xpt` files    
-* `read_sav("file.sav")` and `read_por("file.por")` for `.sav` and `.por` files. `write_sav(tibble, file = "file.sav"` writes a the Tibble `tibble` to the file `file.sav`   
-* `read_dta("file.dta")` and `write_dta(tibble, file = "file.dta")` read and write `.dta` files
+* `read_sas("file.sas7bdate"` and `write_sas(tibble, "file.sas7bdat")` for both `.sas7bdat` and `.sas7bcat` files. `read_xpt("file.xpt")` reads `.xpt` files    
+* `read_sav("file.sav")` and `read_por("file.por")` for `.sav` and `.por` files. `write_sav(tibble, "file.sav"` writes a the Tibble `tibble` to the file `file.sav`   
+* `read_dta("file.dta")` and `write_dta(tibble, "file.dta")` read and write `.dta` files
 
 The additional arguments can be found in the [vignette](https://cran.r-project.org/web/packages/haven/vignettes/semantics.html).
 
 ### `readxl`
 
-`readxl` can be used to read Excel files. `read_excel(file = "file.xls")` works for both `.xls` and `.xlsx` files alike. It guesses the data type from the suffix. Excel files often consist of multiple sheets. `excel_sheets(file = "file.xlsx")` returns the name of the singular sheets. When dealing with an Excel file that contains multiple sheets, you need to specify the sheet you are after in the `read_excel()` function: `read_excel(file = "file.xlsx", sheet = "sheet_1")`. 
+`readxl` can be used to read Excel files. `read_excel("file.xls")` works for both `.xls` and `.xlsx` files alike. It guesses the data type from the suffix. Excel files often consist of multiple sheets. `excel_sheets("file.xlsx")` returns the name of the singular sheets. When dealing with an Excel file that contains multiple sheets, you need to specify the sheet you are after in the `read_excel()` function: `read_excel("file.xlsx", sheet = "sheet_1")`. Please note that it only takes one sheet at a time. 
 
 More on the `readxl` package can be found [here](https://readxl.tidyverse.org).
 
@@ -284,8 +283,8 @@ More on `vroom` [here](https://vroom.r-lib.org/reference/vroom.html) and [here](
 
 # Exercises 
 
-Download the "training files" from my iCloud drive (information on where I got the datasets from can be found in the "sources.md" file) <https://www.icloud.com/iclouddrive/0n5lNovQcjbKMp7uuEYhM5z6g#import_training_files>.
+Download the "training files" from my GitHub (<https://github.com/fellennert/bdawR2020>). If you're not on GitHub: just download the entire repo as .zip file, unpack it, and delete the stuff you do not need. If you are on GitHub: fork it.
 
-Read them in using the right functions. Specify the parameters properly. 
+Read them in using the right functions. Specify the parameters properly. Hints can be found in `hints.md`.
 
 # References

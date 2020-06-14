@@ -162,7 +162,7 @@ ger_car_manufacturer_longer_sep_cyl <- ger_car_manufacturer_longer %>% # first, 
   select(-drop_it) # you will learn about this in the lesson on dplyr  # and then drop one column from the tibble
 ```
 
-If there are two (or actually more) relevant values in one column, you can simply let out the dropping process and easily split them into multiple columns.
+If there are two (or actually more) relevant values in one column, you can simply let out the dropping process and easily split them into multiple columns. By default, the `sep =` argument divides the content by all non-alphanumeric characters (every character that is not a letter, number, or space) it contains. 
 
 Please note that the new column is still in character format. We can change this using `as.numeric()`:
 
@@ -178,7 +178,7 @@ arrange(ger_car_manufacturer_longer_sep_cyl, cylinders)
 
 ## Further functionalities
 
-### Splitting cells 
+### Splitting and merging cells 
 
 If there are multiple values in one column/cell and you want to split them and put them into two rows instead of columns, `tidyr` offers you the `separate_rows()` function. 
 
@@ -192,8 +192,23 @@ tidy_german_cars_tbl <- german_cars_tbl %>%
 
 `enframe()` enables you to create a tibble from a (named) vector. It outputs a tibble with two columns (`name` and `value` by default): `name` contains the names of the elements (if the elements are unnamed, it contains a serial number), `value` the element. Both can be renamed in the function call by providing a character vector.
 
+If you want to achieve the opposite, i.e., merge cells' content, you can use the counterpart, `unite()`. Let's take the following dataframe which consists of the names of the professors of the Institute for Political Science:
+
+```{r}
+professor_names_df <- data.frame(first_name = c("Karlfriedrich", "Martin", "Jerzy", "Stephan", "Melanie"),
+                                 last_name = c("Herb", "Sebaldt", "Maćków", "Bierling", "Walter-Rogg"))
+professor_names_tbl <- professor_names_df %>% 
+  as_tibble() %>% 
+  unite(first_name, last_name, col = "name", sep = " ")
+professor_names_tbl
+```
+
+# Exercises
+
+In the third part of the script, dealing with data import, I asked you to import various datasets from my GitHub repo. Your task now is simple: bring them into a tidy format. More specific instructions can be found in `hints.md`.
+
+# Further links
 
 
-### Handling missing values
 
-### Expand tables
+# References
