@@ -7,10 +7,6 @@ csl: ASA.csl
 bibliography: bibliographyR.bib
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 # Introductory remarks
 
 In probably every script you write you will reach a point where you either want to read in some data to perform operations on them or export the product of those operations to share it with others. In the following, I will show you how to accomplish both.  
