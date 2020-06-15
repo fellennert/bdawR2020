@@ -364,7 +364,7 @@ summary {
 
 <h1 class="title toc-ignore">Getting data into and out from R</h1>
 <h4 class="author">Felix Lennert</h4>
-<h4 class="date">knit on 2020-06-13</h4>
+<h4 class="date">knit on 2020-06-15</h4>
 
 </div>
 
@@ -372,7 +372,7 @@ summary {
 <div id="introductory-remarks" class="section level1">
 <h1>Introductory remarks</h1>
 <p>In probably every script you write you will reach a point where you either want to read in some data to perform operations on them or export the product of those operations to share it with others. In the following, I will show you how to accomplish both.</p>
-<p>In the beginning, the <code>readr</code> package will be introduced. It can be used for the import of the majority of files you will ever want to import and export. If the files become larger, <code>vroom</code> is a viable alternative. Beyond that, there exist some more packages for other types such as Excel or Stata files. I will provide you with a basic tutorial on how to deal with them, too. If you want to work with data in other programming environments, <code>feather</code> might be the way to go.</p>
+<p>In the beginning, the <code>readr</code> package <span class="citation">(Hester et al. 2018)</span> will be introduced. It can be used for the import of the majority of files you will ever want to import and export. If the files become larger, <code>vroom</code> <span class="citation">(Hester et al. 2020)</span> is a viable alternative. Beyond that, there exist some more packages for other types such as Excel or Stata files. I will provide you with a basic tutorial on how to deal with them, too. If you want to work with data in other programming environments, <code>feather</code> <span class="citation">(Wickham 2019)</span> might be the way to go.</p>
 <p>Some notes on the notation: <code>&quot;file.csv&quot;</code> relates to the file you want to read in – please note that it needs to be provided as a character vector, <code>tibble</code> to the Tibble you want to write.</p>
 </div>
 <div id="reading-in-data-sets" class="section level1">
@@ -391,15 +391,15 @@ If you are working in RMarkdown, the working directory is where your RMarkdown d
 <p>In general, importing data with <code>readr</code> is pretty hassle-free: the hardest thing about it is calling the right function. It usually takes care of the rest itself, parsing columns properly, etc. However, sometimes you need to specify additional arguments.</p>
 <p>The following unordered list shows the most common <code>read_*()</code> functions. Usually, you can simply provide them a file path and they load in the data and return a Tibble. If your data is in a compressed file with the extension <code>.gz</code>, <code>.bz2</code>, <code>.xz</code>, or <code>.zip</code>, <code>readr</code> will automatically uncompress it. if the file is stored online, you can provide a URL starting with <code>http://</code>, <code>https://</code>, <code>ftp://</code>, or <code>ftps://</code>. <code>readr</code> will automatically take care of the download process.</p>
 <ul>
-<li><code>read_csv(file = &quot;file.csv&quot;)</code> reads comma delimited files<br />
+<li><code>read_csv(&quot;file.csv&quot;)</code> reads comma delimited files<br />
 </li>
-<li><code>read_csv2(file = &quot;file.csv&quot;)</code> reads semi-colon delimited files<br />
+<li><code>read_csv2(&quot;file.csv&quot;)</code> reads semi-colon delimited files and treats commas as<br />
 </li>
-<li><code>read_delim(file = &quot;file.txt&quot;, delim = &quot;|&quot;)</code> reads files which are delimited by whatever delimiter you specify (<code>|</code> in this case)<br />
+<li><code>read_delim(&quot;file.txt&quot;, delim = &quot;|&quot;)</code> reads files which are delimited by whatever delimiter you specify (<code>|</code> in this case)<br />
 </li>
-<li><code>read_fwf(file = &quot;file.fwf&quot;, col_positions = c(1, 3, 5))</code> reads fixed width files. Here, some sort of data on the columns must be provided, e.g., their positions in the file<br />
+<li><code>read_fwf(&quot;file.fwf&quot;, col_positions = c(1, 3, 5))</code> reads fixed width files. Here, some sort of data on the columns must be provided, e.g., their positions in the file<br />
 </li>
-<li>If the values are separated by whitespace, you can also use <code>read_tsv(file = &quot;file.tsv&quot;)</code> or <code>read_table(file = &quot;file.tsv&quot;)</code></li>
+<li>If the values are separated by whitespace, you can also use <code>read_tsv(&quot;file.tsv&quot;)</code> or <code>read_table(&quot;file.tsv&quot;)</code></li>
 </ul>
 </div>
 <div id="and-their-additional-arguments" class="section level2">
@@ -414,12 +414,12 @@ If you are working in RMarkdown, the working directory is where your RMarkdown d
 </li>
 <li>Sometimes the original creator of your data set might go across missing values differently than you would want it to. <code>na =</code> can be used to specify which values shall be considered missing. If your missings are coded as 99 and 999, for instance, you can address that in the read-in process already by using <code>read_csv(&quot;file.csv&quot;, na = c(&quot;99&quot;, &quot;999&quot;))</code>. Please note that it takes a character vector as argument<br />
 </li>
-<li>In some data sets, the first rows consists of comments that start with particular signs or special characters. Using <code>comment =</code> allows you to skip these lines. For instance, <code>read_csv(file = &quot;file.csv&quot;, comment = &quot;#&quot;)</code> drops all the rows that beginn with a hash.</li>
+<li>In some data sets, the first rows consists of comments that start with particular signs or special characters. Using <code>comment =</code> allows you to skip these lines. For instance, <code>read_csv(&quot;file.csv&quot;, comment = &quot;#&quot;)</code> drops all the rows that beginn with a hash.</li>
 </ul>
 </div>
 <div id="column-types" class="section level2">
 <h2>Column types</h2>
-<p>As you have already learned in the script before, a Tibble consists of multiple vectors of the same length. The vectors can be of different types. When you read in data using <code>readr</code>, it will print out the column types it has guessed. When you read in data, you must ascribe it to an object in your environment. The following code reads in a <code>.csv</code> file with data on the 100 most-played songs on Spotify in 2018 and stores it in the object <code>spotidy_top100_2018</code>.</p>
+<p>As you have already learned in the script before, a Tibble consists of multiple vectors of the same length. The vectors can be of different types. When you read in data using <code>readr</code>, it will print out the column types it has guessed. When you read in data, you must ascribe it to an object in your environment. The following code reads in a <code>.csv</code> file with data on the 100 most-played songs on Spotify in 2018 and stores it in the object <code>spotify_top100_2018</code>.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ───── tidyverse 1.3.0 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.3.0     ✓ purrr   0.3.4
@@ -430,7 +430,7 @@ If you are working in RMarkdown, the working directory is where your RMarkdown d
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code># library(readr) --&gt; no need to load readr, it's part of the core tidyverse
-spotify_top100_2018 &lt;- read_csv(file = &quot;data/spotify2018.csv&quot;)</code></pre>
+spotify_top100_2018 &lt;- read_csv(&quot;data/spotify2018.csv&quot;)</code></pre>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   id = col_character(),
@@ -627,10 +627,10 @@ parse_time(&quot;20:15:00&quot;)</code></pre>
 #  y = col_logical()
 #)</code></pre>
 <p>Third, provide it your <code>read_csv()</code> call as a <code>col_types =</code> argument (by simply pasting it):</p>
-<pre class="r"><code>#challenge_w_date &lt;- read_csv(readr_example(&quot;challenge.csv&quot;),
-#                             col_types = cols(
-#                               x = col_number(),
-#  needs to be modified --&gt;     y = col_double()
+<pre class="r"><code>#challenge &lt;- read_csv(readr_example(&quot;challenge.csv&quot;),
+#                     col_types = cols(
+#                       x = col_double(),
+#  needs to be modified --&gt; y = col_logical()
 #                            ))</code></pre>
 <p>Fourth, modify the argument:</p>
 <pre class="r"><code>#challenge_w_date &lt;- read_csv(readr_example(&quot;challenge.csv&quot;),
@@ -638,11 +638,17 @@ parse_time(&quot;20:15:00&quot;)</code></pre>
 #                               x = col_number(),
 #  modified --&gt;                 y = col_date()
 #                            ))</code></pre>
+<p>Fifth, read it in:</p>
+<pre class="r"><code>challenge &lt;- read_csv(readr_example(&quot;challenge.csv&quot;),
+                      col_types = cols(
+                        x = col_number(),
+                        y = col_date()
+                      ))</code></pre>
 </div>
 </div>
 <div id="rds-and-.rdatafiles" class="section level2">
 <h2><code>.rds</code> and <code>.RData</code>files</h2>
-<p><code>.rds</code> files can be used to store singular R-specific objects (such as lists), <code>.RData</code> files can be used to store multiple R-specific objects. The former can be read in using <code>read_rds(file = &quot;file.rds&quot;)</code>, the latter with <code>load(&quot;file.RData&quot;)</code>. More on <code>read_rds()</code> <a href="https://readr.tidyverse.org/reference/read_rds.html">here</a> and <code>.RData</code> <a href="http://www.sthda.com/english/wiki/saving-data-into-r-data-format-rds-and-rdata">here</a></p>
+<p><code>.rds</code> files can be used to store singular R-specific objects (such as lists), <code>.RData</code> files can be used to store multiple R-specific objects. The former can be read in using <code>read_rds(&quot;file.rds&quot;)</code>, the latter with <code>load(&quot;file.RData&quot;)</code>. More on <code>read_rds()</code> <a href="https://readr.tidyverse.org/reference/read_rds.html">here</a> and <code>.RData</code> <a href="http://www.sthda.com/english/wiki/saving-data-into-r-data-format-rds-and-rdata">here</a></p>
 </div>
 </div>
 <div id="write-data" class="section level1">
@@ -669,20 +675,20 @@ parse_time(&quot;20:15:00&quot;)</code></pre>
 <p>There do also other packages exist for different data types. I will explain the ones which might be of particular use for you and their main-functions only briefly.</p>
 <div id="haven" class="section level3">
 <h3><code>haven</code></h3>
-<p>You can use <code>haven</code> for reading and writing SAS (suffixes <code>.sas7bdat</code>, <code>.sas7bcat</code>, and <code>.xpt</code>), SPSS (suffixes <code>.sav</code> and <code>.por</code>), and STATA (suffix <code>.dta</code>) files.</p>
+<p>You can use <code>haven</code> <span class="citation">(Wickham and Miller 2020)</span> for reading and writing SAS (suffixes <code>.sas7bdat</code>, <code>.sas7bcat</code>, and <code>.xpt</code>), SPSS (suffixes <code>.sav</code> and <code>.por</code>), and STATA (suffix <code>.dta</code>) files.</p>
 <p>The functions then are:</p>
 <ul>
-<li><code>read_sas(file = &quot;file.sas7bdate&quot;</code> and <code>write_sas(tibble, file = &quot;file.sas7bdat&quot;)</code> for both <code>.sas7bdat</code> and <code>.sas7bcat</code> files. <code>read_xpt(file = &quot;file.xpt&quot;)</code> reads <code>.xpt</code> files<br />
+<li><code>read_sas(&quot;file.sas7bdate&quot;</code> and <code>write_sas(tibble, &quot;file.sas7bdat&quot;)</code> for both <code>.sas7bdat</code> and <code>.sas7bcat</code> files. <code>read_xpt(&quot;file.xpt&quot;)</code> reads <code>.xpt</code> files<br />
 </li>
-<li><code>read_sav(&quot;file.sav&quot;)</code> and <code>read_por(&quot;file.por&quot;)</code> for <code>.sav</code> and <code>.por</code> files. <code>write_sav(tibble, file = &quot;file.sav&quot;</code> writes a the Tibble <code>tibble</code> to the file <code>file.sav</code><br />
+<li><code>read_sav(&quot;file.sav&quot;)</code> and <code>read_por(&quot;file.por&quot;)</code> for <code>.sav</code> and <code>.por</code> files. <code>write_sav(tibble, &quot;file.sav&quot;</code> writes a the Tibble <code>tibble</code> to the file <code>file.sav</code><br />
 </li>
-<li><code>read_dta(&quot;file.dta&quot;)</code> and <code>write_dta(tibble, file = &quot;file.dta&quot;)</code> read and write <code>.dta</code> files</li>
+<li><code>read_dta(&quot;file.dta&quot;)</code> and <code>write_dta(tibble, &quot;file.dta&quot;)</code> read and write <code>.dta</code> files</li>
 </ul>
 <p>The additional arguments can be found in the <a href="https://cran.r-project.org/web/packages/haven/vignettes/semantics.html">vignette</a>.</p>
 </div>
 <div id="readxl" class="section level3">
 <h3><code>readxl</code></h3>
-<p><code>readxl</code> can be used to read Excel files. <code>read_excel(file = &quot;file.xls&quot;)</code> works for both <code>.xls</code> and <code>.xlsx</code> files alike. It guesses the data type from the suffix. Excel files often consist of multiple sheets. <code>excel_sheets(file = &quot;file.xlsx&quot;)</code> returns the name of the singular sheets. When dealing with an Excel file that contains multiple sheets, you need to specify the sheet you are after in the <code>read_excel()</code> function: <code>read_excel(file = &quot;file.xlsx&quot;, sheet = &quot;sheet_1&quot;)</code>.</p>
+<p><code>readxl</code> <span class="citation">(Wickham et al. 2019)</span> can be used to read Excel files. <code>read_excel(&quot;file.xls&quot;)</code> works for both <code>.xls</code> and <code>.xlsx</code> files alike. It guesses the data type from the suffix. Excel files often consist of multiple sheets. <code>excel_sheets(&quot;file.xlsx&quot;)</code> returns the name of the singular sheets. When dealing with an Excel file that contains multiple sheets, you need to specify the sheet you are after in the <code>read_excel()</code> function: <code>read_excel(&quot;file.xlsx&quot;, sheet = &quot;sheet_1&quot;)</code>. Please note that it only takes one sheet at a time.</p>
 <p>More on the <code>readxl</code> package can be found <a href="https://readxl.tidyverse.org">here</a>.</p>
 </div>
 <div id="vroom" class="section level3">
@@ -700,16 +706,36 @@ parse_time(&quot;20:15:00&quot;)</code></pre>
 </li>
 <li><code>readr</code> <a href="https://rawgit.com/rstudio/cheatsheets/master/data-import.pdf">Cheatsheet</a><br />
 </li>
-<li>Chapter in R for Data Science <span class="citation">[@wickham2016a]</span> regarding <a href="https://r4ds.had.co.nz/data-import.html">data import</a></li>
+<li>Chapter in R for Data Science <span class="citation">(Wickham and Grolemund 2016)</span> regarding <a href="https://r4ds.had.co.nz/data-import.html">data import</a></li>
 </ul>
 </div>
 <div id="exercises" class="section level1">
 <h1>Exercises</h1>
-<p>Download the “training files” from my iCloud drive (information on where I got the datasets from can be found in the “sources.md” file) <a href="https://www.icloud.com/iclouddrive/0n5lNovQcjbKMp7uuEYhM5z6g#import_training_files" class="uri">https://www.icloud.com/iclouddrive/0n5lNovQcjbKMp7uuEYhM5z6g#import_training_files</a>.</p>
-<p>Read them in using the right functions. Specify the parameters properly.</p>
+<p>Download the “training files” from my GitHub (<a href="https://github.com/fellennert/bdawR2020" class="uri">https://github.com/fellennert/bdawR2020</a>). If you’re not on GitHub: just download the entire repo as .zip file, unpack it, and delete the stuff you do not need. If you are on GitHub: fork it.</p>
+<p>Read them in using the right functions. Specify the parameters properly. Hints can be found in <code>hints.md</code>.</p>
 </div>
-<div id="references" class="section level1">
+<div id="references" class="section level1 unnumbered">
 <h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-hester2018">
+<p>Hester, Jim, Hadley Wickham, Romain François, Jukka Jylänki, and Mikkel Jørgensen. 2018. “Readr: Read Rectangular Text Data.”</p>
+</div>
+<div id="ref-hester2020">
+<p>Hester, Jim, Hadley Wickham, Jukka Jylänki, and Mikkel Jørgensen. 2020. “Vroom: Read and Write Rectangular Text Data Quickly.”</p>
+</div>
+<div id="ref-wickham2019d">
+<p>Wickham, Hadley. 2019. “Feather: R Bindings to the Feather ’API’.”</p>
+</div>
+<div id="ref-wickham2019e">
+<p>Wickham, Hadley, Jennifer Bryan, Komarov Valery, Christophe Leitienne, Bob Colbert, David Hoerl, and Evan Miller. 2019. “Readxl: Read Excel Files.”</p>
+</div>
+<div id="ref-wickham2016a">
+<p>Wickham, Hadley and Garrett Grolemund. 2016. <em>R for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. First edition. Sebastopol, CA: O’Reilly.</p>
+</div>
+<div id="ref-wickham2020b">
+<p>Wickham, Hadley and Evan Miller. 2020. “Haven: Import and Export ’SPSS’, ’Stata’ and ’SAS’ Files.”</p>
+</div>
+</div>
 </div>
 <div class="footnotes">
 <hr />

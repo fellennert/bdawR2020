@@ -3,6 +3,8 @@ title: "Getting data into and out from R"
 author: "Felix Lennert"
 date: "knit on `r lubridate::today()`"
 output: html_document
+csl: ASA.csl
+bibliography: bibliographyR.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -207,20 +209,31 @@ Second, you can copy the column specification from the output to your clipboard:
 Third, provide it your `read_csv()` call as a `col_types =` argument (by simply pasting it):
 
 ```{r}
-#challenge_w_date <- read_csv(readr_example("challenge.csv"),
-#                             col_types = cols(
-#                               x = col_number(),
-#  needs to be modified -->     y = col_double()
+#challenge <- read_csv(readr_example("challenge.csv"),
+#                     col_types = cols(
+#                       x = col_double(),
+#  needs to be modified --> y = col_logical()
 #                            ))
 ```
 
 Fourth, modify the argument:
+
 ```{r}
 #challenge_w_date <- read_csv(readr_example("challenge.csv"),
 #                             col_types = cols(
 #                               x = col_number(),
 #  modified -->                 y = col_date()
 #                            ))
+```
+
+Fifth, read it in:
+
+```{r}
+challenge <- read_csv(readr_example("challenge.csv"),
+                      col_types = cols(
+                        x = col_number(),
+                        y = col_date()
+                      ))
 ```
 
 ## `.rds` and `.RData`files
