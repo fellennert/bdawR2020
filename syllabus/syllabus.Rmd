@@ -175,6 +175,7 @@ But before we can make a data set tidy…
 * Getting data into R: readr, haven, readxl 
 * How to store it: let's revisit Tibbles   
 * A data science conjunction: the pipe
+* Making data tidy: tidyr  
 * A general look at the different tidyverse packages 
 
 This session might be shorter! If you have any questions related to R, pose them after the session! I want to make sure that we are all on the same page before we dive into the actual data wrangling.
@@ -202,7 +203,6 @@ Try to obtain the readings yourself first. If you fail, drop me a mail.
 Now we can dive into the data!
 
 * dplyr
-* tidyr
 * lubridate
 * forcats
 

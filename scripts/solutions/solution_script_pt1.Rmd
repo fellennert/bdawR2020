@@ -2,7 +2,9 @@
 title: "Solutions for first script"
 author: "Felix Lennert"
 date: "knit on `r lubridate::today()`"
-output: html_document
+output: 
+  pdf_document: default
+  html_document: default
 csl: ASA.csl
 bibliography: example-bib.bib
 ---
@@ -39,7 +41,7 @@ Unordered lists look like this:
 * Second entry  
   + sub-item of second entry
   
-Please note that you have to end every line with two spaces. In general, if you want a new line, end the former one with two spaces and hit return. Compare the next two sentence pairs in the RMD -- they look more or less the same, right? 
+In general, if you want a new line, end the former one with two spaces and hit return. Compare the next two sentence pairs in the RMD -- they look more or less the same, right? 
 
 I want to have the next sentence of words in a new line.  
 This sentence is in a new line.
