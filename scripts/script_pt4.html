@@ -446,11 +446,11 @@ tibble_value_headers</code></pre>
 <pre><code>## # A tibble: 5 x 9
 ##   manufacturer `3 cyl` `4 cyl` `5 cyl` `6 cyl` `8 cyl` `10 cyl` `12 cyl`
 ##   &lt;chr&gt;          &lt;int&gt;   &lt;int&gt;   &lt;int&gt;   &lt;int&gt;   &lt;int&gt;    &lt;int&gt;    &lt;int&gt;
-## 1 Audi               8      87       4      33      36        4        7
-## 2 BMW               11      82      10      30      27        1       11
-## 3 Mercedes           5      92      10      39      20        6       19
-## 4 Opel              20      95       5      33      23        4       19
-## 5 VW                15      55       9      31      34        9        9
+## 1 Audi              17      66       2      49      34        1       10
+## 2 BMW               11      71       5      33      34        4       18
+## 3 Mercedes          18      93       7      34      21        1       10
+## 4 Opel               3      87       3      30      23        9       19
+## 5 VW                13      55       5      36      39        8       16
 ## # … with 1 more variable: `16 cyl` &lt;dbl&gt;</code></pre>
 <p>You can create a tibble <em>by column</em> using the <code>tibble</code> function. Column names need to be specified and linked to vectors of either the same length or length one.</p>
 <p>This dataset basically consists of three variables: <code>German car manufacturer</code>, <code>number of cylinders</code>, and <code>frequency</code>. To make the dataset tidy, it has to consist of three columns depicting the three respective variables. This operation is called pivoting the non-variable columns into two-column key-value pairs. As the dataset will thereafter contain fewer columns and more rows than before, it will have become longer (or taller). Hence, the tidyr function is called <code>pivot_longer()</code>.</p>
@@ -460,16 +460,16 @@ ger_car_manufacturer_longer</code></pre>
 <pre><code>## # A tibble: 40 x 3
 ##    manufacturer cylinders frequency
 ##    &lt;chr&gt;        &lt;chr&gt;         &lt;dbl&gt;
-##  1 Audi         3 cyl             8
-##  2 Audi         4 cyl            87
-##  3 Audi         5 cyl             4
-##  4 Audi         6 cyl            33
-##  5 Audi         8 cyl            36
-##  6 Audi         10 cyl            4
-##  7 Audi         12 cyl            7
+##  1 Audi         3 cyl            17
+##  2 Audi         4 cyl            66
+##  3 Audi         5 cyl             2
+##  4 Audi         6 cyl            49
+##  5 Audi         8 cyl            34
+##  6 Audi         10 cyl            1
+##  7 Audi         12 cyl           10
 ##  8 Audi         16 cyl            0
 ##  9 BMW          3 cyl            11
-## 10 BMW          4 cyl            82
+## 10 BMW          4 cyl            71
 ## # … with 30 more rows</code></pre>
 <p>In the function call, you need to specify the following: if you were not to use the pipe, the first argument would be the tibble you are manipulating. Then, you look at the column you want to <strong>keep</strong>. Here, it is the car manufacturer. This means that all columns but <code>manufacturer</code> will be crammed into two new ones: one will contain the columns’ names, the other one their values. How are those new column supposed to be named? That can be specified in the <code>names_to =</code> and <code>values_to =</code>arguments. Please note that you need to provide them a character vector, hence, surround your parameters with quotation marks. As a rule of thumb for all <code>tidyverse</code> packages: If it is a new column name you provide, surround it with quotation marks. If it is one that already exists – like, here, manufacturer, then you do not need the quotation marks.</p>
 </div>
@@ -520,15 +520,15 @@ car_models_fuel_tidy</code></pre>
 <pre><code>## # A tibble: 40 x 3
 ##    manufacturer cylinders frequency
 ##    &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;
-##  1 Audi                 3         8
+##  1 Audi                 3        17
 ##  2 BMW                  3        11
-##  3 Mercedes             3         5
-##  4 Opel                 3        20
-##  5 VW                   3        15
-##  6 Audi                 4        87
-##  7 BMW                  4        82
-##  8 Mercedes             4        92
-##  9 Opel                 4        95
+##  3 Mercedes             3        18
+##  4 Opel                 3         3
+##  5 VW                   3        13
+##  6 Audi                 4        66
+##  7 BMW                  4        71
+##  8 Mercedes             4        93
+##  9 Opel                 4        87
 ## 10 VW                   4        55
 ## # … with 30 more rows</code></pre>
 <div id="insertion-the-pipe" class="section level3">
@@ -542,15 +542,15 @@ car_models_fuel_tidy</code></pre>
 <pre><code>## # A tibble: 40 x 3
 ##    manufacturer cylinders frequency
 ##    &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;
-##  1 Audi                 3         8
+##  1 Audi                 3        17
 ##  2 BMW                  3        11
-##  3 Mercedes             3         5
-##  4 Opel                 3        20
-##  5 VW                   3        15
-##  6 Audi                 4        87
-##  7 BMW                  4        82
-##  8 Mercedes             4        92
-##  9 Opel                 4        95
+##  3 Mercedes             3        18
+##  4 Opel                 3         3
+##  5 VW                   3        13
+##  6 Audi                 4        66
+##  7 BMW                  4        71
+##  8 Mercedes             4        93
+##  9 Opel                 4        87
 ## 10 VW                   4        55
 ## # … with 30 more rows</code></pre>
 <p>could have also been written like this</p>
@@ -558,15 +558,15 @@ car_models_fuel_tidy</code></pre>
 <pre><code>## # A tibble: 40 x 3
 ##    manufacturer cylinders frequency
 ##    &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;
-##  1 Audi                 3         8
+##  1 Audi                 3        17
 ##  2 BMW                  3        11
-##  3 Mercedes             3         5
-##  4 Opel                 3        20
-##  5 VW                   3        15
-##  6 Audi                 4        87
-##  7 BMW                  4        82
-##  8 Mercedes             4        92
-##  9 Opel                 4        95
+##  3 Mercedes             3        18
+##  4 Opel                 3         3
+##  5 VW                   3        13
+##  6 Audi                 4        66
+##  7 BMW                  4        71
+##  8 Mercedes             4        93
+##  9 Opel                 4        87
 ## 10 VW                   4        55
 ## # … with 30 more rows</code></pre>
 <p>because the tibble is the first argument in the function call.</p>
@@ -581,18 +581,18 @@ car_models_fuel_tidy</code></pre>
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -32.626 -16.072   0.935   5.435  60.384 
+## -32.821 -16.190  -0.212   7.973  59.918 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)   46.656      7.896   5.909 7.59e-07 ***
-## cylinders     -3.010      0.876  -3.436  0.00144 ** 
+## (Intercept)  44.0380     7.4384   5.920 7.32e-07 ***
+## cylinders    -2.7391     0.8252  -3.319    0.002 ** 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 23.01 on 38 degrees of freedom
-## Multiple R-squared:  0.2371, Adjusted R-squared:  0.217 
-## F-statistic: 11.81 on 1 and 38 DF,  p-value: 0.001442</code></pre>
+## Residual standard error: 21.68 on 38 degrees of freedom
+## Multiple R-squared:  0.2248, Adjusted R-squared:  0.2044 
+## F-statistic: 11.02 on 1 and 38 DF,  p-value: 0.001999</code></pre>
 <p>As <code>%&gt;%</code> is a bit tedious to type, there exist shortcuts: shift-ctrl-m on a Mac, shift-strg-m on a Windows machine.</p>
 </div>
 </div>

@@ -41,7 +41,7 @@ So what are the most common problems with datasets? The following list is taken 
 
 * Column headers are values, not variable names.    
 * Variables are stored in both rows and columns.  
-* Multiple variables are stored in one colums.  
+* Multiple variables are stored in one column.  
 * Multiple types of observational units are stored in the same table.  
 * A single observational unit is stored in multiple tables.  
 
@@ -120,8 +120,6 @@ parse_number(ger_car_manufacturer_longer$cylinders)
 
 On the other hand, we can also use a handy function from `tidyr` called `separate()` and afterwards drop the unnecessary column:
 
-You can think of the pipe as "and then":
-
 ```{r}
 ger_car_manufacturer_longer_sep_cyl <- ger_car_manufacturer_longer %>% # first, take the tibble
   separate(cylinders, into = c("cylinders", "drop_it"), sep = " ") %>% # and then split the column "cylinders" into two
@@ -146,11 +144,11 @@ arrange(ger_car_manufacturer_longer_sep_cyl, cylinders)
 
 Have you noticed the ` %>% `? That's the pipe. It's from the `magrittr` package [@bache2014] whose name is based on the Belgian painter who has painted this masterpiece:
 
-![figures/pipe1.png]
+![](figures/pipe1.png)
 
 Just kidding:
 
-![figures/pipe2.png]
+![](figures/pipe2.png)
 
 It can be considered a conjunction in coding. Usually, you will use it when working with tibbles. What it does is pretty straight-forward: it takes what is on its left -- the input -- and provides it to the function on its right as the first argument. Hence, the code in the last chunk, which looks like this
 
@@ -166,7 +164,7 @@ ger_car_manufacturer_longer_sep_cyl %>% arrange(cylinders)
 
 because the tibble is the first argument in the function call.
 
-Because `magrittr` really has gained traction in the R community, many functions are now optimized for being used with the pipe. However, there are still some around which are not. A function for fitting a basic linear model with one dependend and one independent variable which are both stored in a tibble looks like this: `lm(formula = dv ~ iv, data = tibble)`. Here, the tibble is not the first argument. To be able to fit a linear model in a "pipeline," you need to employ a little hack: you can use a dot `.` as a placeholder. 
+Because `magrittr` really has gained traction in the R community, many functions are now optimized for being used with the pipe. However, there are still some around which are not. A function for fitting a basic linear model with one dependent and one independent variable which are both stored in a tibble looks like this: `lm(formula = dv ~ iv, data = tibble)`. Here, the tibble is not the first argument. To be able to fit a linear model in a "pipeline," you need to employ a little hack: you can use a dot `.` as a placeholder. 
 
 Let's check out the effect the number of cylinders has on the number of models:
 

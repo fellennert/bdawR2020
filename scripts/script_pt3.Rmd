@@ -34,7 +34,7 @@ If you are working in RMarkdown, the working directory is where your RMarkdown d
 
 In general, importing data with `readr` is pretty hassle-free: the hardest thing about it is calling the right function. It usually takes care of the rest itself, parsing columns properly, etc. However, sometimes you need to specify additional arguments.
 
-The following unordered list shows the most common `read_*()` functions. Usually, you can simply provide them a file path and they load in the data and return a Tibble. If your data is in a compressed file with the extension `.gz`, `.bz2`, `.xz`, or `.zip`, `readr` will automatically uncompress it. if the file is stored online, you can provide a URL starting with `http://`, `https://`, `ftp://`, or `ftps://`. `readr` will automatically take care of the download process.
+The following unordered list shows the most common `read_*()` functions. Usually, you can simply provide them a file path and they load in the data and return a Tibble. If your data is in a compressed file with the extension `.gz`, `.bz2`, `.xz`, or `.zip`, `readr` will automatically uncompress it. If the file is stored online, you can provide a URL starting with `http://`, `https://`, `ftp://`, or `ftps://`. `readr` will automatically take care of the download process.
 
 * `read_csv("file.csv")` reads comma delimited files      
 * `read_csv2("file.csv")` reads semi-colon delimited files and treats commas as           
@@ -48,7 +48,7 @@ Also, all these functions share certain arguments which just need to be included
 
 * If your file does not have a header (most of the time, column names), provide `col_names = FALSE`. The resulting Tibble will have `X1 … Xn` as column names      
 * If your file does not have column names, but you want the resulting Tibble to have some, you can specify them with `col_names = c("a", "b", "c")`. It takes a character vector.     
-* If there are rows you do not want to be considered, you can use `skip =`. For instance, `read_csv("file.csv", skip = 6)` reads everything but the first six data rows (the very first row is normally used for column names and taken into consideration)       
+* If there are rows you do not want to be considered, you can use `skip =`. For instance, `read_csv("file.csv", skip = 6)` reads everything but the first six data rows (the very first row is not taken into consideration as well)       
 * Sometimes the original creator of your data set might go across missing values differently than you would want it to. `na =` can be used to specify which values shall be considered missing. If your missings are coded as 99 and 999, for instance, you can address that in the read-in process already by using `read_csv("file.csv", na = c("99", "999"))`. Please note that it takes a character vector as argument     
 * In some data sets, the first rows consists of comments that start with particular signs or special characters. Using `comment = ` allows you to skip these lines. For instance, `read_csv("file.csv", comment = "#")` drops all the rows that beginn with a hash. 
 
@@ -62,7 +62,7 @@ library(tidyverse)
 spotify_top100_2018 <- read_csv("data/spotify2018.csv")
 ```
 
-If your data is well-behaved, R will guess the vector types correctly and everything will run smoothly. However, sooner or later you will stumble across a data set which is not well-behaved. This is where knowing how to fine-tune your parsing process up-front will eventuelly save you a lot of head scratching.    
+If your data is well-behaved, R will guess the vector types correctly and everything will run smoothly. However, sooner or later you will stumble across a data set which is not well-behaved. This is where knowing how to fine-tune your parsing process up-front will eventually save you a lot of head scratching.    
 
 But how does parsing actually look like. Well, `readr`'s parsing functions take a character vector and return a more specialized vector.
 
@@ -225,7 +225,7 @@ Fourth, modify the argument:
 Fifth, read it in:
 
 ```{r}
-challenge <- read_csv(readr_example("challenge.csv"),
+challenge_w_date <- read_csv(readr_example("challenge.csv"),
                       col_types = cols(
                         x = col_number(),
                         y = col_date()
@@ -253,7 +253,7 @@ Akin to `.rds` files are `.RData` files. They can contain multiple objects and b
 ## `feather`
 
 `feather` provides you with the possibility to write Tibbles in a format which is language-agnostic. Hence, it makes it easier to share data across different languages. You need to 
-read_feather(path, columns = NULL) write_feather(x, path)
+`read_feather(path, columns = NULL)` and `write_feather(x, path)`.
 
 # Alternative ways to read in and write data
 
