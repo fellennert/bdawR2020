@@ -43,7 +43,7 @@ Unordered lists look like this:
   
 In general, if you want a new line, end the former one with two spaces and hit return. Compare the next two sentence pairs in the RMD -- they look more or less the same, right? 
 
-I want to have the next sentence of words in a new line.  
+I want to have the next sentence in a new line.  
 This sentence is in a new line.
 
 I don't want to have the next sentence of words in a new line.

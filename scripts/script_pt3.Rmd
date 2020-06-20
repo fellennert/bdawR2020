@@ -172,7 +172,7 @@ head(challenge)
 problems(challenge)
 ```
 
-When looking at the parsing failures here, what catches the eye is that the first 1000 values of `challenge$y` seem to be NA. Because `readr` only takes the first 1000 rows into account, it parses `challenge$y` as `logical`. However, it should be considered a `date` column. You can specify this using `col_type =`:
+When looking at the parsing failures here, what catches the eye is that the first 1000 values of `challenge$y` seem to be NA. Because `readr` only takes the first 1000 rows into account, it parses `challenge$y` as `logical`. However, it should be considered a `date` column. You can specify this using `col_types =`:
 
 ```{r}
 challenge_w_date <- read_csv(readr_example("challenge.csv"),

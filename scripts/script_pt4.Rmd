@@ -137,7 +137,7 @@ ger_car_manufacturer_longer_sep_cyl$cylinders <- as.numeric(ger_car_manufacturer
 Furthermore, you might want to sort your data in a different manner. If you want to do this by cylinders, it would look like this:
 
 ```{r}
-arrange(ger_car_manufacturer_longer_sep_cyl, cylinders)
+arrange(ger_car_manufacturer_longer_sep_cyl, manufacturer)
 ```
 
 ### Insertion: the pipe
@@ -148,7 +148,7 @@ Have you noticed the ` %>% `? That's the pipe. It's from the `magrittr` package 
 
 Just kidding:
 
-![](figures/pipe2.png)
+![](figures/pipe2.jpg)
 
 It can be considered a conjunction in coding. Usually, you will use it when working with tibbles. What it does is pretty straight-forward: it takes what is on its left -- the input -- and provides it to the function on its right as the first argument. Hence, the code in the last chunk, which looks like this
 

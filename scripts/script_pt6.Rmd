@@ -1,0 +1,193 @@
+---
+title: "Joining data with `dplyr`"
+author: "Felix Lennert"
+date: "knit on `r lubridate::today()`"
+output: html_document
+csl: ASA.csl
+bibliography: bibliographyR.bib
+---
+  
+# Introduction
+  
+The last session showed you three things: how you get datasets into R, a couple of ways to create tibbles, and an introduction to tidy data and how to make datasets tidy using the `tidyr` package. As you may recall from the last session, it was not able to solve the last two problems with only the tools `tidyr` offers. In particular, the problems were:    
+
+* Multiple types of observational units are stored in the same table.
+* A single observational unit is stored in multiple tables.  
+
+Both problems need some different kind of tools: joins. Joins can be used to merge tibbles together. This tutorial, again, builds heavy on the R for Data Science book [@wickham2016a]
+
+# Multiple types of units are in the same table
+
+Let's look at the following dataset. It contains the billboard charts in 2000 and was obtained from the [`tidyr` GitHub repo](https://github.com/tidyverse/tidyr/blob/master/data/billboard.rda). The example below is taken from the `tidyr` vignette which can be loaded using `vignette("tidy-data", package = "tidyr")`.
+
+```{r}
+library(tidyverse)
+library(lubridate)
+load("data/billboard.rda")
+```
+
+```{r}
+glimpse(billboard)
+```
+
+Here, you can immediately see the problem: it contains two types of observations: songs and ranks. Hence, the dataset needs to be split up. However, there should be a pointer from the rank dataset to the song dataset. First, I add an ID column to `song_tbl`. Then, I can add it to `rank_tbl` and drop the unneccessary columns which contain the name of the artist and the track. 
+
+```{r}
+song_tbl <- billboard %>% 
+  distinct(artist, track) %>% 
+  mutate(song_id = row_number())
+```
+
+```{r}
+rank_tbl <- billboard %>% 
+  pivot_longer(cols = starts_with("wk"), 
+               names_to = "week", 
+               names_prefix = "wk", 
+               values_to = "rank") %>% 
+  mutate(week = as.numeric(week),
+         date = date.entered + week * 7) %>% 
+  drop_na() %>% 
+  left_join(song_tbl, by = c("artist", "track")) %>% 
+  select(song_id, date, week, rank)
+```
+
+# One unit is in multiple tables
+
+For this example, I have split up a dataset from the `socviz` package containing data on the 2016 elections in the U.S. according to census region and stored them in a folder. I can scrape the file names in the folder and read it into a list in an automated manner. You will learn this when we touch upon iteration. 
+
+```{r}
+library(fs)
+file_list <- dir_ls(path = "data/socviz_us") %>% 
+  map(read_csv,
+      col_types = cols(
+        id = col_double(),
+        name = col_character(),
+        state = col_character(),
+        census_region = col_character(),
+        pop_dens = col_character(),
+        pop_dens4 = col_character(),
+        pop_dens6 = col_character(),
+        pct_black = col_character(),
+        pop = col_double(),
+        female = col_double(),
+        white = col_double(),
+        black = col_double(),
+        travel_time = col_double(),
+        land_area = col_double(),
+        hh_income = col_double(),
+        su_gun4 = col_character(),
+        su_gun6 = col_character(),
+        fips = col_double(),
+        votes_dem_2016 = col_double(),
+        votes_gop_2016 = col_double(),
+        total_votes_2016 = col_double(),
+        per_dem_2016 = col_double(),
+        per_gop_2016 = col_double(),
+        diff_2016 = col_double(),
+        per_dem_2012 = col_double(),
+        per_gop_2012 = col_double(),
+        diff_2012 = col_double(),
+        winner = col_character(),
+        partywinner16 = col_character(),
+        winner12 = col_character(),
+        partywinner12 = col_character(),
+        flipped = col_character()
+))
+```
+
+The list now consists of four tibbles which need to be bound together. You can achieve this using `bind_rows()`. Its counterpart is `bind_cols()` which binds columns together. It matches rows by position.
+
+```{r}
+election_data <- file_list %>% bind_rows()
+election_data
+```
+
+Now, the dataset is ready for cleaning and tidying. Feel free to do this is as a take-home exercise. 
+
+However, the topic of this script is different joins. The `dplyr` package offers six different joins: `left_join()`, `right_join()`, `inner_join()`, `full_join()`, `semi_join()`, and `anti_join()`. The former four are mutating joins, they add columns. The latter two can be used to filter rows in a dataset. Below is an overview from the `dplyr` cheatsheet:
+
+![Overview of the different joins](figures/joins.png) 
+
+In the following, I will illustrate this using the election data. I split up the dataset into three: data on the elections 2016 and 2012, and demographic data. The column they have in common is the county's respective name. 
+```{r}
+election_data16 <- election_data %>% 
+  select(name, state, votes_dem_2016:diff_2016, winner, partywinner16)
+
+election_data12 <- election_data %>% 
+  select(name, state, per_dem_2012:partywinner12)
+
+demographic_data <- election_data %>% 
+  select(name, state, pop:hh_income) %>% 
+  slice(1:2000)
+```
+
+## `left_join()` and `right_join()`
+
+```{r}
+election_data16 %>% 
+  left_join(demographic_data)
+```
+
+If the column that both datasets have in common has the same name, there's no need to provide it. If this is not the case, you need to provide it in a character vector:
+
+```{r}
+election_data16 %>% 
+  rename(county = name) %>% 
+  right_join(demographic_data, by = c("county" = "name"))
+```
+
+Here, the problem is that the same counties exist in different states. Therefore, all combinations are returned. Hence, I need to specify two arguments: the county's name and state. 
+
+```{r}
+election_data16 %>% 
+  rename(county = name) %>% 
+  right_join(demographic_data, by = c("county" = "name", "state"))
+```
+
+
+Left joins return all rows which are in `x`. If a column is in `x` but not in `y`, an `NA` will be included at this position. Right joins work vice versa.
+
+## `inner_join()`
+
+```{r}
+election_data16 %>% 
+  inner_join(demographic_data)
+```
+
+An `inner_join()` returns all rows which are in `x` and `y`. 
+
+## `full_join()`
+
+```{r}
+election_data16 %>% 
+  full_join(demographic_data)
+```
+
+A `full_join()` returns rows and columns from both `x` and `y`.
+
+## `semi_join()`
+
+Filtering joins only keep the cases from `x`, no dataset is added.
+
+```{r}
+election_data16 %>% 
+  semi_join(demographic_data)
+```
+
+The `semi_join()` returns all rows from x with matching values in `y`. You can compare it to a `right_join()` but without adding the columns of `y`.
+
+## `anti_join()`
+
+```{r}
+election_data16 %>% 
+  anti_join(demographic_data)
+```
+
+`anti_join()` returns all rows from `x` with no matching columns in `y`.
+
+# Further links
+
+* Another introduction can be found [here](https://stat545.com/join-cheatsheet.html).
+* The [chapter in R4DS](https://r4ds.had.co.nz/relational-data.html) has some nice diagrams.
+
+# References
