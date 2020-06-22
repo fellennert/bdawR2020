@@ -398,8 +398,7 @@ typeof(parties_fct)</code></pre>
 </ol>
 <pre class="r"><code>party_sample &lt;- c(sample(parties, 8, replace = TRUE), &quot;CUD&quot;)
 factor(party_sample, levels = parties)</code></pre>
-<pre><code>## [1] Leftists Leftists Greens   AfD      SPD      AfD      CSU      SPD     
-## [9] &lt;NA&gt;    
+<pre><code>## [1] AfD    FDP    Greens CSU    AfD    Greens AfD    FDP    &lt;NA&gt;  
 ## Levels: AfD CDU CSU FDP Greens Leftists SPD</code></pre>
 <p>If you want to access the levels, use <code>levels()</code></p>
 <pre class="r"><code>levels(parties_fct)</code></pre>
@@ -501,6 +500,19 @@ ggplot(aes(x = sum_votes, y = state)) +
 <pre class="r"><code>levels(parties_fct_ger)</code></pre>
 <pre><code>## [1] &quot;AfD&quot;                    &quot;CDU&quot;                    &quot;CSU&quot;                   
 ## [4] &quot;FDP&quot;                    &quot;Buendnis90/Die Gruenen&quot; &quot;Die Linke&quot;             
+## [7] &quot;SPD&quot;</code></pre>
+<p>In this case, this can be done pretty quickly. Just copy the levels and manipulate the order:</p>
+<pre class="r"><code>parties_fct_ger_alphabetical &lt;- fct_relevel(parties_fct_ger, 
+                                            c(&quot;AfD&quot;, 
+                                              &quot;Buendnis90/Die Gruenen&quot;, 
+                                              &quot;CDU&quot;, 
+                                              &quot;CSU&quot;,
+                                              &quot;Die Linke&quot;,
+                                              &quot;FDP&quot;,
+                                              &quot;SPD&quot;))
+levels(parties_fct_ger_alphabetical)</code></pre>
+<pre><code>## [1] &quot;AfD&quot;                    &quot;Buendnis90/Die Gruenen&quot; &quot;CDU&quot;                   
+## [4] &quot;CSU&quot;                    &quot;Die Linke&quot;              &quot;FDP&quot;                   
 ## [7] &quot;SPD&quot;</code></pre>
 <p>Now you need to write something for someone who is not particular familiar with the political landscape in Germany and rather wants “left,” “center,” and “right” instead of the party’s names. Give <code>fct_collapse()</code> a shot – and feel free to change it if you disagree with my classification.</p>
 <pre class="r"><code>lcr_ger &lt;- fct_collapse(parties_fct,

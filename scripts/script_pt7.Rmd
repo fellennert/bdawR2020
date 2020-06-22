@@ -138,6 +138,20 @@ Damn, now the levels are not in alphabetical order anymore.
 levels(parties_fct_ger)
 ```
 
+In this case, this can be done pretty quickly. Just copy the levels and manipulate the order:
+
+```{r}
+parties_fct_ger_alphabetical <- fct_relevel(parties_fct_ger, 
+                                            c("AfD", 
+                                              "Buendnis90/Die Gruenen", 
+                                              "CDU", 
+                                              "CSU",
+                                              "Die Linke",
+                                              "FDP",
+                                              "SPD"))
+levels(parties_fct_ger_alphabetical)
+```
+
 Now you need to write something for someone who is not particular familiar with the political landscape in Germany and rather wants "left," "center," and "right" instead of the party's names. Give `fct_collapse()` a shot -- and feel free to change it if you disagree with my classification.
 
 ```{r}
