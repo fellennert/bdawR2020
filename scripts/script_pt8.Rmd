@@ -49,16 +49,6 @@ today()
 now()
 ```
 
-yq() Q for quarter. yq("2001: Q3")
-hms::hms() Also lubridate::hms(), hm() and ms(), which return periods.* hms::hms(sec = 0, min= 1, hours = 2)
-date_decimal(decimal, tz = "UTC") date_decimal(2017.5)
-now(tzone = "") Current time in tz (defaults to system tz). now()
-today(tzone = "") Current date in a tz (defaults to system tz). today()
-fast_strptime() Faster strptime. fast_strptime('9/1/01', '%y/%m/%d')
-parse_date_time() Easier strptime. parse_date_time("9/1/01", "ymd")
-
-
-
 # Manipulating dates
 
 ## Components
@@ -110,6 +100,7 @@ head(OlsonNames()) # wrapped it with head() because it's 593 in total
 ```
 
 If you want to set a new time-zone to a date-object -- hence, 2 o'clock UTC becomes 2 o'clock CET -- use `force_tz()`:
+
 ```{r}
 force_tz(example_datetime, tzone = "CET")
 ```
@@ -211,7 +202,7 @@ int_flip(interval(today(), ymd("2020-12-24")))
 
 You can also shift an interval:
 
-today until christmas --> tomorrow until december 25:
+today until Christmas --> tomorrow until December 25:
 
 ```{r}
 int_shift(christmas, by = days(1))

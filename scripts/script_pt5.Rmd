@@ -44,7 +44,7 @@ The dataset hasn't been modified by me before. I will show you how I would go ac
 glimpse(imdb_raw)
 ```
 
-The columns I want to keep are: `Title`, `Director`, `Year`, `Runtime (Minutes)`, `Rating`, `Votes`, and `Revenue (Millions`. Furthermore, I want to rename the columns: every column's name should be in lowercase and a regular name that does not need to be surrounded by backticks -- i.e., a name that only consists of characters, numbers, underscores, or dots. 
+The columns I want to keep are: `Title`, `Director`, `Year`, `Runtime (Minutes)`, `Rating`, `Votes`, and `Revenue (Millions`. Furthermore, I want to rename the columns: every column's name should be in lowercase and a regular name that does not need to be surrounded by back ticks -- i.e., a name that only consists of characters, numbers, underscores, or dots. 
 
 This can be achieved in a couple of ways:
 
@@ -284,7 +284,7 @@ You can see the summary functions below:
 
 ![Summary functions in R](figures/summary functions.png)
 
-Another handy function akin to this is `count()`. It counts all occurences of a singular value in the tibble.
+Another handy function akin to this is `count()`. It counts all occurrences of a singular value in the tibble.
 
 If I were interested in how many movies of the different directors have made it into the dataset, I could use this code:
 

@@ -30,7 +30,7 @@ load("data/billboard.rda")
 glimpse(billboard)
 ```
 
-Here, you can immediately see the problem: it contains two types of observations: songs and ranks. Hence, the dataset needs to be split up. However, there should be a pointer from the rank dataset to the song dataset. First, I add an ID column to `song_tbl`. Then, I can add it to `rank_tbl` and drop the unneccessary columns which contain the name of the artist and the track. 
+Here, you can immediately see the problem: it contains two types of observations: songs and ranks. Hence, the dataset needs to be split up. However, there should be a pointer from the rank dataset to the song dataset. First, I add an ID column to `song_tbl`. Then, I can add it to `rank_tbl` and drop the unnecessary columns which contain the name of the artist and the track. 
 
 ```{r}
 song_tbl <- billboard %>% 
