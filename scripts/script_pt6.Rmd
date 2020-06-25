@@ -36,6 +36,8 @@ Here, you can immediately see the problem: it contains two types of observations
 song_tbl <- billboard %>% 
   distinct(artist, track) %>% 
   mutate(song_id = row_number())
+
+glimpse(song_tbl)
 ```
 
 ```{r}
@@ -45,10 +47,12 @@ rank_tbl <- billboard %>%
                names_prefix = "wk", 
                values_to = "rank") %>% 
   mutate(week = as.numeric(week),
-         date = date.entered + week * 7) %>% 
+         date = date.entered + (week-1) * 7) %>% 
   drop_na() %>% 
   left_join(song_tbl, by = c("artist", "track")) %>% 
   select(song_id, date, week, rank)
+
+glimpse(rank_tbl)
 ```
 
 # One unit is in multiple tables
@@ -99,7 +103,7 @@ The list now consists of four tibbles which need to be bound together. You can a
 
 ```{r}
 election_data <- file_list %>% bind_rows()
-election_data
+glimpse(election_data)
 ```
 
 Now, the dataset is ready for cleaning and tidying. Feel free to do this is as a take-home exercise. 
@@ -183,7 +187,7 @@ election_data16 %>%
   anti_join(demographic_data)
 ```
 
-`anti_join()` returns all rows from `x` with no matching columns in `y`.
+`anti_join()` returns all rows from `x` with no matching rows in `y`.
 
 # Further links
 

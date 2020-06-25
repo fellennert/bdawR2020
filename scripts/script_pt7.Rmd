@@ -68,7 +68,6 @@ Sometimes you want to reorder factors -- for instance, when you want to create p
 
 ```{r}
 election_data_w_fct %>% 
-  distinct(state, .keep_all = TRUE) %>% 
   group_by(state) %>% 
   summarize(sum_votes = sum(votes)) %>% 
 ggplot(aes(x = sum_votes, y = state)) +
@@ -78,8 +77,7 @@ ggplot(aes(x = sum_votes, y = state)) +
 Two orders would make sense: alphabetical and according to their number of votes. `fct_reorder()` takes another variable and orders the factor according to it.
 
 ```{r}
-election_data_w_fct %>% 
-  distinct(state, .keep_all = TRUE) %>% 
+election_data_w_fct %>%
   group_by(state) %>% 
   summarize(sum_votes = sum(votes)) %>% 
   mutate(state = fct_reorder(state, sum_votes)) %>% 
@@ -91,7 +89,6 @@ If you want to have it ordered the other way round, multiply the ordering variab
 
 ```{r}
 election_data_w_fct %>% 
-  distinct(state, .keep_all = TRUE) %>% 
   group_by(state) %>% 
   summarize(sum_votes = sum(votes)) %>% 
   mutate(state = fct_reorder(state, sum_votes*(-1))) %>% 
@@ -103,7 +100,6 @@ You could also achieve this by calling `fct_rev()` afterwards: it reverses the o
 
 ```{r}
 election_data_w_fct %>% 
-  distinct(state, .keep_all = TRUE) %>% 
   group_by(state) %>% 
   summarize(sum_votes = sum(votes)) %>% 
   mutate(state = fct_reorder(state, sum_votes),
@@ -116,14 +112,14 @@ If you want to do bar plots, which you can use to depict the frequency of a valu
 
 ```{r}
 election_data_w_fct %>% 
-  mutate(lead = lead %>% fct_infreq()) %>% 
+  mutate(lead = lead %>% fct_infreq() %>% fct_rev()) %>% 
   ggplot(aes(x = lead)) +
     geom_bar()
 ```
 
 ## Modifying levels
 
-Remember the first factor? You need to put some graphs together and decide that you would rather like to use the original German names for the parties. Go for `fct_rename()`.
+Remember the first factor? You need to put some graphs together and decide that you would rather like to use the original German names for the parties. Go for `fct_recode()`.
 
 ```{r}
 parties_fct_ger <- fct_recode(parties_fct,
@@ -168,7 +164,7 @@ election_data_w_fct %>%
   mutate(candidate = fct_lump(candidate, n = 2))
 ```
 
-The problem here is that Gary Stein appears as often as the two other candidates (have you ever heard of him?). Hence, `fct_lump()` cannot decide which levels to lump together. However, it has saved me a couple lines of code:
+The problem here is that Gary Johnson appears as often as the two other candidates (have you ever heard of him?). Hence, `fct_lump()` cannot decide which levels to lump together. However, it has saved me a couple lines of code:
 
 ```{r}
 election_data_w_fct %>% 

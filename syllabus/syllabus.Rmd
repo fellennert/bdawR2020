@@ -227,7 +227,7 @@ Visualize your data!
 
 * ggplot2
 
-Note: For this session, it is crucial to have understood the concepts introduced in the sessions before. In data analysis, visualization comes in the vast majority of cases far behind the wrangling, meaning that the dataset is tailored towards the visualization function.
+Note: For this session, it is crucial to have understood the concepts introduced in the sessions before. In data analysis, visualization comes in the vast majority of cases after the wrangling. Hence, that the dataset needs to be tailored towards the visualization function.
 
 Furthermore: Data challenge #1 is handed out after the session. Due on `r return_course_date("mon", 5)`.
 
@@ -238,10 +238,12 @@ Social Network Analysis and Text Mining -- brace yourself for two quick 45 minut
 Readings:  
 
 For Text Mining:
+
 * Grimmer, Justin/Stewart, Brandon 2013: Text as Data: The Promise and Pitfalls of Automatic Content Analysis Methods for Political Texts. In *Political Analysis (2013)*, pp. 1-–31.    
 * Silge, Julia/Robinson, David 2019: *Text Mining with R. A Tidy Approach*. Sebastopol et al.: O’Reilly Media. (--> can be read [online](www.tidytextmining.com))
 
 Social Network Analysis:
+
 * Borgatti, Stephen/Mehra, Ajay/Brass, Daniel/Labianca, Giuseppe, 2009: Network Analysis in the Social Sciences. In *Science (323)*, pp. 892--895.   
 * Marin, Alexandra/Wellman, Barry 2011: Social Network Analysis: An Introduction. In: Scott, John/Carrington, Peter (eds.): *The SAGE Handbook of Social Network Analysis*. London et al.: SAGE Publications Ltd, pp. 12--25. (--> will be uploaded to GRIPS)
 * Watts, Duncan 2004: The “New” Science of Networks. In *Annual Review of Sociology 30(1)*, pp. 243--270.

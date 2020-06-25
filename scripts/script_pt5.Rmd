@@ -44,7 +44,7 @@ The dataset hasn't been modified by me before. I will show you how I would go ac
 glimpse(imdb_raw)
 ```
 
-The columns I want to keep are: `Title`, `Director`, `Year`, `Runtime (Minutes)`, `Rating`, `Votes`, and `Revenue (Millions`. Furthermore, I want to rename the columns: every column's name should be in lowercase and a regular name that does not need to be surrounded by back ticks -- i.e., a name that only consists of characters, numbers, underscores, or dots. 
+The columns I want to keep are: `Title`, `Director`, `Year`, `Runtime (Minutes)`, `Rating`, `Votes`, and `Revenue (Millions)`. Furthermore, I want to rename the columns: every column's name should be in lowercase and a regular name that does not need to be surrounded by back ticks -- i.e., a name that only consists of characters, numbers, underscores, or dots. 
 
 This can be achieved in a couple of ways:
 
@@ -95,7 +95,7 @@ imdb_selected <- imdb_raw %>%
   glimpse()
 ```
 
-As you may have noticed, the order in the `select()` matters: columns will be ordered in the same manner as they are chosen.
+As you may have noticed, the order in the `select()` matters: columns will be ordered in the same order as they are chosen.
 
 A couple of further shortcuts for `select()` do exist. An overview can be found in the [`dplyr` cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf).
 
@@ -331,4 +331,4 @@ Chapeau, Nitesh Tiwari!
 3. What's the highest ranked movie?
 4. Which movie got the most votes?
 5. Which movie had the biggest revenue in 2016?
-6. How much revenue made the movies in the dataset every year in total?
+6. How much revenue did the movies in the dataset make every year in total?
