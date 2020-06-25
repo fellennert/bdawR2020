@@ -332,3 +332,28 @@ Chapeau, Nitesh Tiwari!
 4. Which movie got the most votes?
 5. Which movie had the biggest revenue in 2016?
 6. How much revenue did the movies in the dataset make every year in total?
+7. Filter movies following some conditions:
+    a. More runtime than the average runtime (hint: you could also use `mutate()` before).
+    b. Movies directed by J. J. Abrams.
+    c. More votes than the median of all of the votes.
+    d. The movies which have the most common value in terms of rating (`mode()` does not exist -- run the script below and use the `my_mode` function).
+    
+
+```{r}
+## helper function for mode
+
+my_mode <- function(x){ 
+    ta = table(x)
+    tam = max(ta)
+    if (all(ta == tam))
+         mod = NA
+    else
+         if(is.numeric(x))
+    mod = as.numeric(names(ta)[ta == tam])
+    else
+         mod = names(ta)[ta == tam]
+    return(mod)
+}
+
+```
+
