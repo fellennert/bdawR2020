@@ -1,0 +1,73 @@
+---
+title: "Take-home Assignment #1"
+author: "Felix Lennert"
+date: "handed out on 2020-06-29; to be handed in on 2020-07-06 at latest"
+output: html_document
+---
+
+Dear student,
+
+This is the first take-home assignment for the course "Big Data Analysis with R." You can team up with one of your peers and work on it together. I am absolutely sure that it will challenge you and this is definitely intended. If you have questions, reach out whenever. Seriously, whenever. So far, very few of you have done so. Therefore, I have no clue how good or bad it is going for you. 
+
+Well, let's go in medias res. The dataset you will work with is from a tidy Tuesday challenge. I will not provide you the source right now, because then you could just simply look up the solution online. However, if you are stuck, you can try to search for it. To make sure that you have understood what you are doing, I want you to add comments next to your code, i.e., by inserting a '#' on the right of the code and briefly describing why this command is necessary. You can also describe what the chunks are doing in the Markdown file between chunks. 
+
+1. Acquire the dataset by running the following chunk. Install the missing packages first if necessary. I commented the code for you to show you some web-scraping and how you should comment your code.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(rvest)
+library(tidyverse)
+url <- "https://www.nu3.de/blogs/nutrition/food-carbon-footprint-index-2018" # url to scrape
+
+# scrape the website
+url_html <- read_html(url) # read the page
+
+# extract the HTML table
+whole_table <- url_html %>% 
+  html_nodes('table') %>% # select table
+  html_table(fill = TRUE) %>% # parse it to date frame
+  .[[1]] # pull out the data frame
+
+table_content <- whole_table %>%
+  select(-X1) %>% # remove redundant column
+  filter(!dplyr::row_number() %in% 1:3) # remove redundant rows
+
+raw_headers <- url_html %>%
+  html_nodes(".thead-icon") %>% # select element 
+  html_attr('title') # pull out column names
+
+tidy_bottom_header <- raw_headers[28:length(raw_headers)]
+
+raw_middle_header <- raw_headers[17:27]
+
+tidy_headers <- c( # fix headers
+  rep(raw_middle_header[1:7], each = 2),
+  "animal_total",
+  rep(raw_middle_header[8:length(raw_middle_header)], each = 2),
+  "non_animal_total",
+  "country_total")
+
+combined_colnames <- paste(tidy_headers, tidy_bottom_header, sep = ';') # create column names
+colnames(table_content) <- c("Country", combined_colnames) # add column names
+table_content_tbl <- as_tibble(table_content)
+table_content_tbl
+```
+
+2. Make the dataset tidy. Ask yourself the following questions: which variables does it contain? How can I put them into separate rows? 
+
+3. Change the column names so that they do not have to be surrounded by backticks (i.e., they should only consists of lowercase characters, numbers, dots, and underscores).
+
+4. Coerce variables to factors (if it makes sense). 
+
+5. Visualize your dataset with `ggplot2`.
+    a. A scatter plot with `consumption` on the x and `kg CO2` on the y axis. Color the dots according to `country`.
+    b. A smoothed line with the same variables (no country-specific color coding though).
+    c. Faceted graphs according to type of food.
+    d. A scatter plot with the sum of supply for consumption per country (x axis) and total CO2 emissions per country (y axis). Color the dots as in (a).
+    e. Faceted graphs: countries that start with "a"--"l" and "m"--"z".
+    
+6. Store your dataset as a csv-file.
+    
+You work with tibbles, so use means from the `tidyverse` packages and store your data in a tibble. Data manipulations should be performed using the pipe operator. Code for 2--4 can be put in one chunk. If you need some further information, drop me an email with "hint" in it and I will provide you some. Assignment is to be handed in as an RMarkdown file (you can build upon this one) until 2020-07-06 via email. 
+
+Have fun,  
+Felix

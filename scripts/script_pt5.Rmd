@@ -336,7 +336,7 @@ Chapeau, Nitesh Tiwari!
     a. More runtime than the average runtime (hint: you could also use `mutate()` before).
     b. Movies directed by J. J. Abrams.
     c. More votes than the median of all of the votes.
-    d. The movies which have the most common value in terms of rating (`mode()` does not exist -- run the script below and use the `my_mode` function).
+    d. The movies which have the most common value (the mode) in terms of rating (`mode()` does exist but will not work in the way you might like it to work -- run the script below and use the `my_mode` function).
     
 
 ```{r}
