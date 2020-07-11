@@ -1,0 +1,397 @@
+---
+title: "Tidy text mining"
+author: "Felix Lennert"
+date: "knit on `r lubridate::today()`"
+output: html_document
+csl: ASA.csl
+bibliography: bibliographyR.bib
+---
+
+# Introduction
+
+The following script will deal with text mining in R. This can be conducted in a couple of ways. There are a couple of packages around which you can use for text mining, such as `quanteda` [@benoit2018] or `tm` [@feinerer2008], and `tidytext` [@silge2020] is probably the most recent addition to them. As you could probably tell from its name, tidytext obeys the tidy data principles. "Every observation is a row" translates here to "one-token-per-row" -- "token" not necessarily relating to a singular term, but also to n-gram, sentence, or paragraph. 
+
+In the following, I will demonstrate how text mining using tidy principles can look like in R. The `sotu` package contains all the so-called "State of the Union" addresses -- the president gives them to the congress annually -- since 1790.  
+
+
+```{r}
+library(tidyverse)
+library(sotu)
+sotu_raw <- sotu_meta %>% 
+  bind_cols(sotu_text) %>% 
+  rename(content = `...6`) %>% 
+  distinct(content, .keep_all = TRUE)
+```
+
+# Preprocessing: put it into tidy text format
+
+Now that the data is read in, I need to clean it. For this purpose, I take a look at the first entry of the tibble.
+
+```{r}
+sotu_raw %>% slice(1) %>% pull(content)
+```
+
+## Cleaning 
+
+Nice, that looks pretty clean already. However, I do not need capital letters, line breaks (`\n`), and punctuation. `str_to_lower()`, `str_replace_all()`, and `str_squish()` from the `stringr` package [@wickham2019a] are the right tools for this job. The first one transforms every letter to lowercase, the second one replaces all the occurences of certain classes with whatever I want it to (a whitespace in my case), and the final one removes redundant whitespace (i.e., repeated occurences of whitespaces are reduced to 1).
+
+```{r}
+library(stringr)
+sotu_clean <- sotu_raw %>% 
+  mutate(content = str_to_lower(content),
+         content = str_replace_all(content, "[^[:alnum:] ]", " "),
+         content = str_squish(content))
+```
+
+The next step is to remove stopwords -- they are not necessary for the sentiment analyses I want to perform first. The stopwords package has a nice list for English.
+
+```{r}
+library(stopwords)
+stopwords_vec <- stopwords(language = "en")
+```
+
+However, it might be easier if I first bring it into the tidy format -- every token in a row. Stopwords can then be removed by a simple `anti_join()`
+
+## `unnest_tokens()`
+
+I will focus on the 20th century SOTUs. Here, the `between()` function comes in handy.
+
+```{r}
+sotu_20cent_clean <- sotu_clean %>% 
+  filter(between(year, 1900, 2000))
+```
+
+Now I can tokenize them:
+
+```{r}
+library(tidytext)
+sotu_20cent_tokenized <- sotu_20cent_clean %>% 
+  unnest_tokens(output = token, input = content)
+glimpse(sotu_20cent_tokenized)
+```
+
+The new tibble consists of 917,678 rows. Please note that usually you have to put some sort of id column into your original tibble before tokenizing it, e.g., by giving each case -- representing a document, or chapter, or whatever -- a separate id. This does not apply here, because my original tibble came with a bunch of meta data (president, year, party). 
+
+Removing the stopwords now is straight-forward:
+
+```{r}
+sotu_20cent_tokenized_nostopwords <- sotu_20cent_tokenized %>% 
+  filter(!token %in% stopwords_vec)
+```
+
+Another option would have been to `anti_join()` the tibble which the `get_stopwords()` function returns. For doing this, the column which contains the singular tokens needs to be called `word` or a named vector needs to be provided which links the name to word:
+
+```{r}
+sotu_20cent_tokenized_nostopwords <- sotu_20cent_tokenized %>% 
+  anti_join(get_stopwords(), by = c("token" = "word"))
+```
+
+Another thing I forgot to remove are digits. They do not matter for the analyses:
+
+```{r}
+sotu_20cent_tokenized_nostopwords_nonumbers <- sotu_20cent_tokenized_nostopwords %>% 
+  filter(!str_detect(token, "[:digit:]"))
+```
+
+Beyond that, I can stem my words:
+
+```{r}
+library(SnowballC)
+sotu_20cent_tokenized_nostopwords_nonumbers_stemmed <- sotu_20cent_tokenized_nostopwords_nonumbers %>% 
+  mutate(token = wordStem(token, language = "en"))
+```
+
+## In a nutshell
+
+Well, all those things could also be summarized in one nice cleaning pipeline:
+
+```{r}
+sotu_20cent_clean <- sotu_clean %>% 
+  filter(between(year, 1900, 2000)) %>% 
+  unnest_tokens(output = token, input = content) %>% 
+  anti_join(get_stopwords(), by = c("token" = "word")) %>% 
+  filter(!str_detect(token, "[:digit:]")) %>% 
+  mutate(token = wordStem(token, language = "en"))
+```
+
+Now I have created a nice tibble containing the SOTU addresses of the 20th century in a tidy format. This is a great point of departure for subsequent analyses. 
+
+# Sentiment analysis
+
+Sentiment analyses are fairly easy when you have your data in tidy text format. As they basically consist of matching the particular words' sentiment values to the corpus, this can be done with an `inner_join()`. `tidytext` comes with four dictionaries: bing, loughran, afinn, and nrc:
+
+```{r}
+walk(c("bing", "loughran", "afinn", "nrc"), ~{print(head(get_sentiments(lexicon = .x)))})
+```
+
+As you can see here, the dictionaries are mere tibbles with two columns: "word" and "sentiment". For easier joining, I should rename my column "token" to word.
+
+```{r}
+library(magrittr)
+sotu_20cent_clean %<>% rename(word = token)
+```
+
+The AFINN dictionary is the only one with numeric values. You might have noticed that its words are not stemmed. Hence, I need to do this before I can join it with my tibble. To get the sentiment value per document, I need to average it.
+
+```{r}
+sotu_20cent_afinn <- get_sentiments("afinn") %>% 
+  mutate(word = wordStem(word, language = "en")) %>% 
+  inner_join(sotu_20cent_clean) %>% 
+  group_by(year) %>% 
+  summarize(sentiment = mean(value))
+```
+
+Thereafter, I can just plot it:
+
+```{r}
+sotu_20cent_afinn %>% 
+  ggplot() +
+  geom_line(aes(x = year, y = sentiment))
+```
+
+That's a bit hard to interpret. `geom_smooth()` might help:
+
+```{r}
+sotu_20cent_afinn %>% 
+  ggplot() +
+  geom_smooth(aes(x = year, y = sentiment))
+```
+
+Interesting. When you think of the tone in the SOTU addresses as a proxy measure for the current circumstances, the worst phase appears to be during the 1920s and 1930s -- might make sense given the then economic circumstances etc. The maximum was in around the 1960s and since then it has, apparently, remained fairly stable. 
+
+## TF-IDF
+
+But how did the singular decades differ from each other? An answer might lie in the tf-idf (term frequency -- inverse document frequency). The idea is to emphasize words which are not used very often in the corpus (hence, inverse document frequency) and multiply them with how often words appear in a document (term frequency). The tf-idf is "the frequency of a term adjusted for how rarely it is used." [@silge2017: 31] If a term is rarely used overall but appears comparably often in a singular document, it might be safe to assume that it plays a bigger role in that document.
+
+I will split up the data into decades and check which terms appear to be more important in them. I use the texts including stopwords:
+
+First, decades are introduced:
+
+```{r}
+sotu_20cent_clean_decades <- sotu_clean %>% 
+  filter(between(year, 1900, 2000)) %>% 
+  unnest_tokens(input = content, output = word) %>% 
+  mutate(decade = paste0(as.character(floor(year / 10) * 10), "s"),
+         decade = as_factor(decade))
+```
+
+Second, the singular terms in the decades are counted:
+
+```{r}
+sotu_20cent_termcount <- sotu_20cent_clean_decades %>% 
+  count(decade, word, sort = TRUE)
+```
+
+Third, the total of terms per decade is counted as well:
+
+```{r}
+sotu_20cent_wordcount <- sotu_20cent_termcount %>% 
+  group_by(decade) %>% 
+  summarize(total = sum(n))
+```
+
+Fourth, the tibbles are joined:
+
+```{r}
+sotu_20cent_termcount %<>% left_join(sotu_20cent_wordcount)
+```
+
+### Side note: Zipf's law
+
+As a brief side note: When I look at the distribution of words -- how many occur how often -- and plot it, you can see that the distribution has long tails. 
+
+```{r}
+sotu_20cent_termcount %>% 
+  ggplot(aes(n/total, fill = decade)) +
+  geom_histogram(legend = FALSE) +
+  xlim(NA, 0.001) +
+  facet_wrap(~decade, ncol = 4)
+```
+
+This is typical in language and is referred to as Zipf's law. It says that few words occur very often and many words occur rarely. You can plot the frequency of a word's occurence and its rank on a double log scale, and will more or less end up with a constant, negative slope.
+
+```{r}
+sotu_20cent_termcount %>% 
+  group_by(decade) %>% 
+  mutate(rank = row_number(),
+         term_frequency = n/total) %>% 
+  ggplot(aes(x = rank, y = term_frequency, color = decade)) +
+  geom_line() +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+## `bind_tf_idf()`
+The tf-idf is now calculated using `bind_tf_idf()`.
+
+```{r}
+sotu_20cent_tf_idf <- sotu_20cent_termcount %>% 
+  bind_tf_idf(word, decade, n)
+
+sotu_20cent_tf_idf
+```
+
+Do you see how those more common words get zero? When you work with tf-idfs, there is no need to remove stopwords, because they are universally common across documents and, hence, will get a value which is basically 0.
+
+Let's look at the important words…
+
+```{r}
+sotu_20cent_tf_idf %>% 
+  arrange(desc(tf_idf))
+```
+
+Well, there's a lot of years and numbers in there. I will exclude them:
+
+```{r}
+sotu_20cent_tf_idf %<>%
+  filter(!str_detect(word, "[:digit:]"))
+```
+
+Now I can extract the top-five terms for every decade:
+
+```{r}
+sotu_20cent_tf_idf_top5 <- sotu_20cent_tf_idf %>% 
+  group_by(decade) %>% 
+  slice_max(tf_idf, n = 5)
+```
+
+And plot them:
+
+```{r}
+sotu_20cent_tf_idf_top5 %>% 
+  ggplot() +
+  geom_col(aes(x = tf_idf, y = word)) +
+  facet_wrap(~decade, scales = "free")
+```
+
+This graph already gives you some hints on what sort of topics were prevalent in the 20th century's SOTU addresses. 
+
+# Latent Dirichlet Allocation (LDA)
+
+In the former section, I, first, explored how the sentiment in the SOTU addresses has evolved over the 20th century. Then, I looked at the decade-specific vocabulary. This, paired with previous knowledge of what happened thorughout the 20th century, sufficed to gain some sort of insights. However, another approach to infer meaning from text is to search it for topics. This is also possible with the SOTU corpus which I have at hand. 
+
+The two main assumptions of LDA are as follows:
+
+* Every document is a mixture of topics.
+* Every topic is a mixture of words.
+
+Hence, singular documents do not necessarily be distinct in terms of their content. They can be related -- if they contain the same topics. This is definitely more in line with natural language's use.
+
+The following graphic depicts a flowchart of text analysis with the `tidytext` package. 
+
+![Text analysis flowchart](https://www.tidytextmining.com/images/tidyflow-ch-6.png)
+
+What becomes evident is that the actual topic modeling does not happen within `tidytext`. For this, the text needs to be transformed into a document-term-matrix and then passed on to the `topicmodels` package [@grun2020], which will take care of the modeling process. Thereafter, the results are turned back into tidy format, so that they can be visualized using `ggplot2`.
+
+## Document-term matrix
+
+In order to search for the topics which are prevalent in the singular addresses, I need to transform the tidy tibble into a document-term matrix. This can be achieved with `cast_dtm()`.
+
+```{r}
+sotu_dtm <- sotu_20cent_clean %>% 
+  count(year, word) %>% 
+  filter(between(year, 1990, 2000)) %>% 
+  cast_dtm(document = year, term = word, value = n)
+```
+
+This DTM can now be used to create an LDA model.
+
+## Inferring the number of topics
+
+The thing with LDA models is that I need to tell the model in advance how many topics I assume to be present within the document. Since I have neither read the SOTU addresses nor any secondary literature about them, I cannot make a guess on how many topics are in there. Furthermore, you want to use LDA to uncover the topics within the corpus in general. This is totally doable with LDA, but you will need to go some extra-miles to assess the number of topics and then evaluate your choice.
+
+### Making guesses
+
+One approach might be to just providing it with wild guesses on how many topics might be in there and then trying to make sense of it afterwards.
+
+```{r}
+library(topicmodels)
+library(broom)
+sotu_lda_k10 <- LDA(sotu_dtm, k = 10, control = list(seed = 123))
+
+sotu_lda_k10_tidied <- tidy(sotu_lda_k10)
+```
+
+The `tidy()` function from the `broom` package [@robinson2020] brings the LDA output back into a tidy format. It consists of three columns: the topic, the term, and beta, which is the probability that the term stems from this topic. Now, I can wrangle it a bit, and then visualize it with `ggplot2`. 
+
+```{r}
+top_terms_k10 <- sotu_lda_k10_tidied %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 5) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+
+top_terms_k10 %>%
+  mutate(topic = factor(topic),
+         term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(term, beta, fill = topic)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  scale_x_reordered() +
+  facet_wrap(~topic, scales = "free", ncol = 2) +
+  coord_flip()
+```
+
+Now the hard part begins: making sense of it in an inductive manner. But, of course, there is a large probability that I just chose the wrong number of topics. Therefore, before scratching my head trying to come to meaningful conclusions, I should first assess what the optimal number of models is.
+
+### Perplexity
+
+`topicmodels` is offering a measure called perplexity for this. It basically tells you how well a probability model predicts a sample. The lower the value, the better. 
+
+```{r}
+perplexity(sotu_lda_k10)
+```
+
+Nice, my value is 656. What does it mean? Well, nothing, as long as I do not compare it with other models whose k's differ. I will calculate the perplexity for ks between 1 and 10.
+
+```{r}
+model_list <- vector(mode = "list", length = 9)
+
+for (i in 2:10) {
+  model_list[[i-1]] <- LDA(sotu_dtm, k = i, control = list(seed = 123))
+}
+```
+
+```{r}
+perplexity_dbl <- map_dbl(model_list, perplexity)
+
+tibble(
+  k = 2:10,
+  perplexity = perplexity_dbl
+) %>% 
+  ggplot() +
+  geom_line(aes(x = k, y = perplexity))
+```
+
+Apparently, as the slope's negative, there are more than 10 topics to be found in the SOTU corpus -- no surprise. However, that goes beyond the computational capabilities of my machine here, so I will just leave it be.
+
+## Document-topic probabilities
+
+Another thing to assess is document-topic probabilities: which document belongs to which topic
+
+```{r}
+sotu_lda_k10_document <- tidy(sotu_lda_k10,matrix = "gamma")
+```
+
+This shows you the proportion of words of the document which were drawn from the specific topics. 
+In 1990, for instance, many words were drawn from the first topic.
+
+```{r}
+top_terms_k10 %>%
+  mutate(topic = factor(topic),
+         term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(term, beta, fill = topic)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  scale_x_reordered() +
+  facet_wrap(~topic, scales = "free", ncol = 2) +
+  coord_flip()
+```
+
+However, the top five words of topic 1 are fairly unspecific. 
+
+# Further readings
+
+* [Tidy text mining with R](https://www.tidytextmining.com/index.html).
+* A more general [introduction by Christopher Bail](https://cbail.github.io/textasdata/Text_as_Data.html).
+
+# References
+

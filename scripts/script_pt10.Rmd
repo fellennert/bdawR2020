@@ -1,0 +1,364 @@
+---
+title: "Iteration -- loops and `purrr::map`"
+author: "Felix Lennert"
+date: "knit on `r lubridate::today()`"
+output: html_document
+csl: ASA.csl
+bibliography: bibliographyR.bib
+---
+
+# Introduction
+
+Today's session will all be about following the DRY principle. DRY stands for Don't Repeat Yourself. "Why not?", you might ask yourself. Well, the problem with copy-and-pasting code is that you have to change all the variable names in every instance of your code. RStudio has a nice Search-and-Replace function which might facilitate that, but it still bears the danger of writing code that contains errors. This is where you will need to make use of the tools that R offers you to iterate over a couple of elements, perform operations on them, and return the results. An example:
+
+```{r}
+example_strings <- c("this", "is", "how", "a", "for", "loop", "works")
+
+for (i in seq_along(example_strings)) {
+  print(example_strings[[i]])
+}
+```
+
+Another option -- from the tidyverse -- is the `purrr` package:
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+walk(example_strings, print)
+```
+
+So, what has this code done? In both cases, it has taken the function `print()` and applied it to every value of our vector. Copy-and-paste would have looked like this:
+
+```{r}
+print(example_strings[[1]])
+print(example_strings[[2]])
+print(example_strings[[3]])
+print(example_strings[[4]])
+print(example_strings[[5]])
+print(example_strings[[6]])
+print(example_strings[[7]])
+print(example_strings[[7]])
+```
+
+Damn, I pasted the last instance twice. In this case, the mistake is obvious, but oftentimes it is not. 
+
+In the following, I will provide you a more extensive introduction into conditional statements, loops, and the `purrr` package. 
+
+# Flow control
+
+Sometimes you want your code to only run in specific cases. For `mutate()`, I have already showed you conditional imputation of values with `case_when()`. A more generalized approach for conditionally running code in R are `if` statements. They look as follows:
+
+```{r eval=FALSE}
+if (conditional_statement evaluates to TRUE) {
+  do_something
+}
+```
+
+They also have an extension -- `if…else`:
+
+```{r eval=FALSE}
+if (conditional_statement evaluates to TRUE) {
+  do_something
+} else {
+  do_something_else
+}
+```
+
+Imagine that I want R to tell you whether a number it draws is bigger than five:
+
+```{r}
+set.seed(123)
+x <- sample(10, 1)
+
+if (x <= 5) {
+  print("x is smaller than or equals 5")
+}
+```
+
+In this case, x is 3, so the if statement returns something. If this is not the case, nothing happens:
+
+```{r}
+set.seed(1234)
+x <- sample(10, 1)
+
+if (x <= 5) {
+  print("x is smaller than or equals 5")
+}
+```
+
+Now I could extend it by another `if` statement:
+
+```{r}
+if (x > 5) {
+  print("x is greater than 5")
+}
+```
+
+But `else` now allows me to take a shortcut
+
+```{r}
+if (x <= 5) {
+  print("x is smaller than or equals 5")
+} else {
+  print("x is greater than 5")
+}
+```
+
+Please note that the condition inside the if statement needs to be a vector of type logical (hence, either `TRUE` or `FALSE`). 
+Apart from that, only the first value will be used:
+
+```{r}
+if (c(TRUE, FALSE, TRUE)) {
+  print("example")
+}
+```
+
+# Loops
+
+Strictly speaking, there are three kinds of loops: for, repeat, and while. I will touch upon for and while, because they are more straight-forward than repeat. Repeat loops will repeat a task until you tell it to stop by hitting the escape button or adding a condition up front. Interactive programming -- hitting the escape button to break a loop -- is no desired practice and while loops have internalized the condition already. Hence, repeat loops do not appear to have any advantage and I can leave them out deliberately.
+
+## for loops
+
+for loops are the sort of loops you will have to work with more often as they allow you to loop *over* a predefined number of elements. For this sake, I will briefly revise how you index vectors, lists, and tibbles.
+
+The ith element of a vector can be accessed by using either `[[i]]` or `[i]`. 
+
+The ith element of a list can be obtained by using `[[i]]` -- `[i]` would return a sub list instead of the element. The second element of the ith element in a list (if it were a vector) can be obtained using `[[i]][[2]]` etc.
+
+The ith column of a tibble can be accessed as a vector using `[[i]]`. The second value of the ith column of a tibble can be accessed using `[[i]][[2]]`
+
+How does that matter for for loops? Remember the example I showed you in the beginning? All a for loop does is iterating over a vector of values and imputing them instead of a placeholder.
+
+```{r}
+example_strings <- c("this", "is", "how", "a", "for", "loop", "works")
+
+for (i in seq_along(example_strings)) {
+  print(example_strings[[i]])
+}
+
+seq_along(example_strings) # seq_along looks like this
+
+# hence, the first iteration looks like this.
+
+print(example_strings[[seq_along(example_strings)[[1]]]])
+# translates to
+print(example_strings[[1]])
+```
+
+However, this course is about data analysis. So, I have a tibble with different cars and I want to perform some operations on some columns. In this case, I want the average value for every column where it makes sense.
+
+```{r}
+cars_tbl <- mtcars %>% 
+  rownames_to_column(var = "model_name") %>% 
+  select(mpg, cyl, disp, hp, gear)
+glimpse(cars_tbl)
+```
+
+```{r}
+output <- double(length = ncol(cars_tbl))
+output <- set_names(output, colnames(cars_tbl))
+# names dont look good -- for loop and change them to "mean_*" using the paste-function
+
+for (i in seq_along(cars_tbl)) {
+  output[[i]] <- mean(cars_tbl[[i]])
+}
+```
+
+Every for loop consists of three components:
+
+* Output: In the beginning, I create a `double` vector `output <- double(length = ncol(cars_tbl))`. As you can see here, I determine the length of the vector in the beginning. This is due to efficiency: if you were to grow the vector by every iteration (using `c`), the loop becomes very slow. This is especially important if you work with large datasets.  
+* Sequence: `i in seq_along(cars_tbl)` tells the for loop what to loop over.  
+* Body: `output[[i]] <- mean(cars_tbl[[i]])`. The actual code. Performs the operation on the respective column `cars_tbl[[whatever 'i']]` and stores the resulting value in the pre-defined output vector at position `i`.
+
+One problem with for loops is that they are considered slow. They are not, at least not if you stick to the following rules:
+
+* Always preallocate space -- make sure that R does not have to expand your objects
+* Do as much as you can outside the loop -- every operation inside the loop will be repeated every time the loop is repeated
+
+## for loop variations
+
+In general, you will come across three different problems with for loops.
+
+* Modifying an existing object
+* Length of output is unknown
+* Sequences are of unknown length
+
+### Modify the existing object
+
+Remember the for loop with the `cars_tbl`? I could have performed the same operation storing it in the very same tibble again:
+
+```{r}
+for (i in seq_along(cars_tbl)) {
+  cars_tbl[[i]] <- mean(cars_tbl[[i]])
+}
+```
+
+However, in this case it preserves the number of rows and changes all the values to the respective measure. Hence, I need to `slice()` it.
+
+```{r}
+cars_tbl_sliced <- cars_tbl %>% 
+  slice(1)
+```
+
+### Length of output is unknown
+
+Sometimes, you do not know how long your output object is. This is, for instance, if you simulate vectors of random length. Normally, you would just put the values into a vector. However, if you do not know the length, then you would have to ask R to grow the vector every iteration. But this is extremely inefficient. For this, the solution is `lists`. You always know how many iterations your loop will have. Hence, you can create a list of this exact length and then just store the results in the list (as lists do not care about the length of the singular elements). Afterwards, you can `unlist()` or `flatten_*()` the list into a vector.
+
+### Unknown sequence length
+
+Seldom, you also do not know how long your input sequence is. Instead, you want to loop until a certain condition is met. This is where while loops come in handy (but this is the only use case I could think of).
+
+The basic structure of while loops is as follows:
+
+```{r eval=FALSE}
+while (condition) {
+  code
+}
+```
+
+What could an example look like?^[I have taken this example from the R for Data Science book. I hardly ever work with while loops -- I have used them once, to be precise -- and, therefore, I could not really come up with an example myself.] The following loop keeps running until three heads appeared in a row and the condition is met. 
+
+Please note that both vectors which are to be modified within the loop -- `indicator` and `head` -- need to be created beforehand. If I had not created `head` beforehand, the loop would have not started because there would not have been any vector to assess the length.
+
+```{r}
+indicator <- 0
+head <- c()
+while (length(head) < 3) {
+  if (sample(2, 1) == 1) {
+    x <- "head"
+  } else {
+    x <- "tail"
+  }
+  if (x == "head") {
+    head <- c(head, 1)
+  } else {
+    length(head) <- 0
+  }
+  indicator <- indicator + 1
+}
+```
+
+# purrr::map()
+
+Loops are good because they make everything very explicit. However, it is often tedious to type. The `purrr` package provides functions which enable you to iterate over vectors, data frames/tibbles, and lists. Apart from that, it has a lot of functions to work with lists as well. I will only cover the former functions. If you are interested in using `purrr` for working with lists, check out [this extensive tutorial by Jenny Bryan](https://jennybc.github.io/purrr-tutorial/).
+
+In the beginning of this chapter, I used the `walk()` function. This function is related to `map()` as it iterates over a vector and applies a function to its respective elements. The difference is that `walk()` doesn't store the results, `map()` does. 
+
+## The basics
+
+The structure of the `map()` function looks like this:
+
+```{r eval=FALSE}
+map(vector or list, function(, if you need it, additional arguments of function))
+```
+
+`map()` always returns a list. 
+
+If you want the output to be in a different format, there are different, type-specific `map()` functions.
+
+* `map_dfr()` returns a data frame -- by binding the rows
+* `map_dfc()` returns a data frame -- by binding the columns
+* `map_dbl()` returns a double vector
+* `map_chr()` returns a character vector
+* `map_lgl()` returns a logical vector
+
+In the following I will demonstrate the function of `map()` with a simple example. The basic vector I will map over is:
+
+```{r}
+example_dbl <- c(1.5, 1.3, 1.8, 1.9, 2.3)
+```
+
+In the first example, I just add 10 to the vector. In order to do so, I first need to create a function which adds 10.
+
+```{r}
+add_10 <- function(x) {
+  x + 10
+}
+```
+
+```{r}
+map(example_dbl, add_10)
+```
+
+```{r}
+map_dbl(example_dbl, add_10)
+```
+
+```{r}
+map_chr(example_dbl, add_10) # does not make sense though
+```
+
+## Anonymous functions
+
+In the former example, I had to specify the function beforehand. `map()` also allows you to define the function within the call using a so-called anonymous function. The function's argument is `.x` which stands for the respective input. 
+
+```{r}
+map_dbl(example_dbl, ~{
+  .x + 10
+  })
+```
+
+The for loop which calculated the mean for the `cars_tbl` would have looked like this in `purrr`:
+
+```{r}
+map(cars_tbl, mean)
+```
+
+When I put it into a tibble, names are preserved:
+
+```{r}
+map_dfr(cars_tbl, mean)
+```
+
+## Mapping over multiple arguments
+
+Sometimes you want to apply things to multiple arguments. Think for example of the `sample()`function. It requires at least two arguments: the size of the sample you draw and the element space `x` you draw the sample from.
+
+```{r}
+map2(10, 5, sample)
+```
+
+However, the `map2()` functions do not provide you with the possibility to control the type of output you get. You can take care of this using `flatten_*()`.
+
+```{r}
+map2(10, 5, sample) %>% flatten_dbl()
+```
+
+If you provide it with a vector which is longer than 1, `map2()` will not perform the operation on every possible combination of the two vectors. Instead, it iterates over both vectors simultaneously, hence, the first iteration uses the first two values, the second iteration the second two values etc.
+
+```{r}
+map2(c(10, 5), c(5, 3), sample) 
+```
+
+If you want to map over more than two arguments, `pmap()` is the way to go. If you work with functions which need multiple values as arguments, you can store the vectors containing the respective values in a tibble. You should name the columns according to the function's arguments.
+
+An example here is drawing numbers from a normal distribution -- `rnorm()`. The function takes three arguments: `n`-- the number of values to be drawn, `mean`, and `sd`.
+
+```{r}
+tibble(
+  n = 10,
+  mean = 1:10,
+  sd = 0.5
+) %>% 
+  pmap(rnorm)
+```
+
+# Further links
+
+* [Chapter about loops in Hands-on Programming with R](https://rstudio-education.github.io/hopr/loops.html#for-loops)
+* On [control flow](https://resbaz.github.io/2014-r-materials/lessons/30-control-flow/)
+* A [basic introduction to `purrr::map`](http://www.rebeccabarter.com/blog/2019-08-19_purrr/)
+* The [corresponding chapter in R4DS](https://r4ds.had.co.nz/iteration.html#introduction-14)
+
+
+# Exercises
+
+1. Use a for loop to create proper names for the output in line 158. You can use `paste` to accomplish this task.
+2. Use a for loop to compute the `median` of every column in `cars_tbl`.
+3. Create a new vector of type character and length 3. Try to fill it with "I" "accomplished" "task3".
+4. Try to store the results of the `pmap()` call in a tibble. How could you go across this? 
+
+```{r}
+# example for paste()
+paste("Pass", "strings", "to", "paste", sep = " ")
+```
+

@@ -1,0 +1,18 @@
+---
+title: "Social Network Analysis with `tidygraph` and `ggraph`"
+author: "Felix Lennert"
+date: "knit on `r lubridate::today()`"
+output: html_document
+csl: ASA.csl
+bibliography: bibliographyR.bib
+---
+
+# Introduction
+
+When it comes to social network analysis, there exist a couple of ways to store relational data. One is by putting them in an adjacency matrix:
+
+```{r}
+adj_example <- matrix(sample(0:1, 16), dimnames = list(c("A", "B", "C", "D"), c("A", "B", "C", "D"))
+```
+
+

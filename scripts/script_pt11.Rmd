@@ -1,0 +1,157 @@
+---
+title: "Functional programming"
+author: "Felix Lennert"
+date: "knit on `r lubridate::today()`"
+output: html_document
+csl: ASA.csl
+bibliography: bibliographyR.bib
+---
+
+# Introduction
+
+So far, every call you have made within R contained a function. Even the most basic operations, such as `c()` for building vectors, rely on functions. Functions are the verbs of R, they *do* something to your objects. Hence, you as someone who obeys the principles of DRY can make good use of them. Whenever you need to copy code to perform certain tasks to an object, you can also put those tasks into a function and just provide the function with the objects.
+
+Imagine you want to rescale some variables in a tibble (an example I took from R4DS [@wickham2016a]):
+
+```{r}
+set.seed(1234)
+library(tidyverse)
+df <- tibble(
+  a = rnorm(10),
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+
+df$a <- (df$a - min(df$a, na.rm = TRUE)) / 
+  (max(df$a, na.rm = TRUE) - min(df$a, na.rm = TRUE))
+df$b <- (df$b - min(df$b, na.rm = TRUE)) / 
+  (max(df$b, na.rm = TRUE) - min(df$b, na.rm = TRUE))
+df$c <- (df$c - min(df$c, na.rm = TRUE)) / 
+  (max(df$c, na.rm = TRUE) - min(df$c, na.rm = TRUE))
+df$d <- (df$d - min(df$d, na.rm = TRUE)) / 
+  (max(df$d, na.rm = TRUE) - min(df$d, na.rm = TRUE))
+```
+
+Given that you now know how to loop over the tibble, you can certainly reduce the amount of copy-pasting here. 
+
+```{r}
+df <- tibble(
+  a = rnorm(10),
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+
+for (i in seq_along(df)) {
+  df[[i]] <- (df[[i]] - min(df[[i]], na.rm = TRUE)) / 
+  (max(df[[i]], na.rm = TRUE) - min(df[[i]], na.rm = TRUE))
+}
+```
+
+However, the operation within the loop is generalizable: it always only takes a vector of numeric values as input, performs some actions on them and returns another vector of the same length, but rescaled into a range from 0 to 1. Hence, the operation fulfills the requirements for putting it into a function. 
+
+Doing so has some advantages:
+
+* If an error occurs, you can simply change the function in one place -- when you define it -- instead of changing all the occurrences in your code
+* It will certainly make your code easier to read -- `rescale0to1` is a more concise description than `(x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x. na.rm = TRUE))` (--> you see what I did here? I already replaced the arguments with a generic variable. You can use it to write the function yourself (Exercise 1).)
+
+# Writing your own functions
+
+When you define functions in R, you need to follow a certain structure:
+
+```{r eval=FALSE}
+function_name <- function(argument_1, argument_2, argument_n) {
+  function body
+}
+```
+
+* The `function_name` is the thing you will call (e.g., `mean()`). In general, it should be a verb, it should be concise, and it should be in_snakecase.
+* The `argument`s are what you need to provide the function with (e.g., `mean(`*1:10*`)`).
+* The `function body`contains the operations which are performed to the arguments. It can contain other functions as well -- which need to be defined beforehand (e.g., `sum(1:10) / length(1:10)`)). It is advisable to split up the function body into as little pieces as you can.
+
+# An example: Roulette
+
+In the following, I will guide you through a quick example on how you could use functions to play an extremely basic game of Roulette with R. You provide it with two values (how much you bet and which number you choose) and R takes care of the rest.
+
+So what does the function need to do? First, it needs to draw a number between 0 and 36. Second, it needs to compare the bet and its corresponding number. Third, it needs to return the respective result.
+
+```{r}
+roulette <- function(bet, number) {
+  draw <- sample(0:36, 1)
+  tibble(
+    winning_number = draw,
+    your_number = number,
+    your_bet = bet,
+    your_return = if (number == draw) {
+      bet * 36
+    } else {
+      0
+    }
+  )
+}
+
+roulette(bet = 1, number = 35)
+```
+
+But how to make sure that I do not bet on a number which I cannot bet on (i.e., numbers greater than 36)? Or, put differently, how to forbid values? Use `stop()`. Besides, how to set default values for the arguments? Just use `argument = default`. 
+
+```{r}
+roulette_restricted <- function(bet = 1, number) {
+  if (number > 36) stop("You can only bet on numbers between 0 and 36.")
+  draw <- sample(0:36, 1)
+  tibble(
+    winning_number = draw,
+    your_number = number,
+    your_bet = bet,
+    your_return = if (number == draw) {
+      bet * 36
+    } else {
+      0
+    }
+  )
+  #return(tbl_return)
+}
+roulette_restricted(bet = 4, number = 35)
+```
+
+The function returns the results of the last call, i.e., the tibble. If you want to be more concrete about what it should return, use `return()`:
+
+```{r}
+roulette_basic <- function(bet = 1, number) {
+  if (number > 36) stop("You can only bet on numbers between 0 and 36.")
+  draw <- sample(0:36, 1)
+  if (number == draw) {
+    return(paste("Nice, you won", as.character(bet * 36), "Dollars"), sep = " ")
+  } else {
+    return("I'm sorry, you lost.")
+  }
+}
+roulette_basic(number = 2)
+```
+
+# Further readings
+
+I do not expect you to grasp the content of today's session immediately and entirely. My goal was to make you at least somehow familiar with the DRY principles and how you can incorporate it into your everyday coding. If you want to learn more about functional programming, check out the following resources:
+
+* The [R4DS chapter](https://r4ds.had.co.nz/functions.html)
+* [A basic tutorial](https://www.tutorialspoint.com/r/r_functions.htm)
+* A [book chapter](https://b-rodrigues.github.io/modern_R/defining-your-own-functions.html#writing-your-own-functions) about control-flow and functions
+* [Hadley on functional programming](http://adv-r.had.co.nz/Functional-programming.html)
+
+# Exercises
+
+1. Create a `rescale0to1` function. 
+2. Play 10 rounds of Roulette and store the results in a tibble (e.g., by storing them in a list and then calling `bind_rows()`)
+    a. using a for loop
+    b. using a while loop
+    c. using map()
+3. Extend the Roulette function (colors!). You will need a lot of if...else. Try to split it up into several functions (e.g., `determine_color`, `determine_return`, etc.). Make it "bullet-proof" -- how should you go across cases where people bet on a number and a color? 
+You can use the following code chunk to determine the values and their colors:
+```{r}
+red_fields <- c(32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3)
+black_fields <- setdiff(1:36, red_fields)
+zero <- 0
+```
+
+# References

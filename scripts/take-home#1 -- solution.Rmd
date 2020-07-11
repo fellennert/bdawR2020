@@ -58,14 +58,80 @@ table_content_tbl
 
 4. Coerce variables to factors (if it makes sense). 
 
+```{r}
+table_content_tbl_tidy <- table_content_tbl %>% 
+  pivot_longer(-Country, names_to = "type", values_to = "value") %>% # pivot columns to type and values to value
+  separate(type, into = c("food", "type"), sep = ";") %>% # separate food and type (two different types)
+  pivot_wider(names_from = type, values_from = value) %>% # pivot different types into columns
+  drop_na() %>% # drop rows with NAs
+  rename(country = Country, # rename variables 
+         food_type = food, 
+         kg_consumption = `Supplied for Consumption (kg/person/year)`, 
+         kg_co2 = `Kg CO2/person/year`) %>% 
+  mutate(country = as_factor(country), # coerce country and food_type to factors
+         food_type = as_factor(food_type),
+         kg_consumption = as.numeric(kg_consumption), # coerce kgs to numeric (otherwise plotting not possible)
+         kg_co2 = as.numeric(kg_co2))
+```
+
 5. Visualize your dataset with `ggplot2`.
+
     a. A scatter plot with `consumption` on the x and `kg_co2` on the y axis. Color the dots according to `country`.
+    
+```{r}
+table_content_tbl_tidy %>% ggplot() +
+  geom_point(aes(x = kg_consumption, y = kg_co2, color = country)) +
+  theme(legend.position = "none") # remove legend
+```
+
     b. A smoothed line with the same variables (no country-specific color coding though).
+
+```{r}
+table_content_tbl_tidy %>% ggplot() +
+  geom_smooth(aes(x = kg_consumption, y = kg_co2))
+```
+
     c. Faceted graphs according to type of food.
+    
+```{r}
+table_content_tbl_tidy %>% ggplot() +
+  geom_point(aes(x = kg_consumption, y = kg_co2)) +
+  facet_wrap(~food_type)
+```
+
     d. A scatter plot with the sum of supply for consumption per country (x axis) and total CO2 emissions per country (y axis). Color the dots as in (a).
+    
+```{r}
+table_content_tbl_tidy %>% 
+  group_by(country) %>% 
+  summarize(across(is.numeric, sum)) %>%  # summarizes all columns which are numeric
+  ggplot() +
+  geom_point(aes(x = kg_consumption, y = kg_co2, color = country)) +
+  theme(legend.position = "none") # remove legend
+```
+    
     e. Faceted graphs: countries that start with "a"--"l" and "m"--"z".
     
+```{r}
+table_content_tbl_tidy %>% 
+  group_by(country) %>% 
+  mutate(sum_consumption = sum(kg_consumption),
+         sum_emission = sum(kg_co2),
+         indicator = case_when(as.character(country) < "m" ~ "a--l", # indicator: if "smaller" than m, then a--l
+                               as.character(country) >= "m" ~ "m--z")) %>% 
+  ggplot() +
+  geom_point(aes(x = sum_consumption, y = sum_emission)) +
+  facet_wrap(~indicator) +
+  theme(legend.position = "none")
+```
+    
+I have not added any legend titles, nice labels or anything. I also did not care about the appearance -- except for that I removed the legend when it was too big. It was not asked for in the assignment and, hence, I did not take it into consideration when rating your submissions. However, I really appreciated when you did so.
+    
 6. Store your dataset as a csv-file.
+
+```{r}
+# read_csv(table_content_tbl_tidy, "dataset_food_consumption.csv")
+```
     
 You work with a tibble, so use means from the `tidyverse` packages and store your data in a tibble. Data manipulations should be performed using the pipe operator. Code for 2--4 can be put in one chunk. If you need some further information, drop me an email with "hint" in it and I will provide you some. Assignment is to be handed in as an RMarkdown (you can build upon this one) and html file until 2020-07-06 via email. 
 

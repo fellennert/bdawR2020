@@ -3,9 +3,10 @@
 # 3. What's the highest ranked movie?
 # 4. Which movie got the most votes?
 # 5. Which movie had the biggest revenue in 2016?
-# 6. How much revenue made the movies in the dataset every year in total?
+# 6. How much revenue did the movies in the dataset make every year in total?
 
 library(tidyverse)
+
 imdb <- read_csv("scripts/data/imdb2006-2016.csv")  %>% 
   select(title = Title, director = Director, year = Year, runtime = `Runtime (Minutes)`, rating = Rating, votes = Votes, revenue_million = `Revenue (Millions)`, rank = Rank) 
 
@@ -33,11 +34,13 @@ imdb %>% group_by(year) %>%
     # a. More runtime than the average runtime (hint: you could also use `mutate()` before).
 imdb %>% filter(runtime > mean(runtime))
 
-    b. Movies directed by J. J. Abrams.
+#    b. Movies directed by J. J. Abrams.
 imdb %>% filter(director == "J.J. Abrams")
-    c. More votes than the median of all of the votes.
+
+#    c. More votes than the median of all of the votes.
 imdb %>% filter(votes > median(votes))
-    d. The movies which have the most common value in terms of rating (`mode()` does not exist -- run the script below and use the `my_mode` function).
+
+#    d. The movies which have the most common value in terms of rating (`mode()` does not exist -- run the script below and use the `my_mode` function).
 imdb %>%  filter(rating == my_mode(rating))
 
 # function
